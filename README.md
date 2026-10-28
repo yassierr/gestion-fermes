@@ -59,7 +59,7 @@ gestion-fermes/
 
 ## Technologies
 
-Java 17, JavaFX, PostgreSQL (JDBC), Maven, BCrypt, OpenPDF, JUnit 5, Javadoc.
+Java 25, JavaFX, PostgreSQL (JDBC), Maven, BCrypt, OpenPDF, JUnit 5, Javadoc.
 
 ## Configuration (phase de réalisation)
 
