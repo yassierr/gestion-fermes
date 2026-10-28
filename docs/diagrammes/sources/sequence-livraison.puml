@@ -1,0 +1,45 @@
+@startuml
+title Livraison à une station de conditionnement (administrateur)
+autonumber
+actor Administrateur
+participant "Écran Livraison\n(FXML)" as Vue
+participant "VenteController" as Ctrl
+participant "VenteService" as Svc
+participant "RecolteDAO" as RDao
+participant "VenteDAO" as VDao
+participant "PdfUtil" as Pdf
+database "PostgreSQL" as DB
+
+Administrateur -> Vue : choisit le client (station)
+Vue -> Ctrl : charger les stocks disponibles
+Ctrl -> Svc : stocksDisponibles()
+Svc -> RDao : stockParFerme()
+RDao -> DB : SUM(récoltes) - SUM(lignes non annulées) par ferme
+DB --> RDao : stock par ferme
+RDao --> Svc : liste des stocks
+Svc --> Ctrl : stocks disponibles
+Ctrl --> Vue : afficher les fermes et leurs kg
+Administrateur -> Vue : saisit kg et prix par ferme
+Vue -> Ctrl : clic sur « Valider la livraison »
+Ctrl -> Svc : creerLivraison(client, lignes)
+Svc -> Svc : vérifier quantité <= stock disponible
+
+alt stock suffisant pour toutes les lignes
+  Svc -> VDao : enregistrer(vente, lignes)
+  VDao -> DB : BEGIN
+  VDao -> DB : INSERT INTO vente
+  VDao -> DB : INSERT INTO ligne_vente (une par ferme)
+  VDao -> DB : COMMIT
+  DB --> VDao : ok
+  VDao --> Svc : Vente créée
+  Svc --> Ctrl : Vente
+  Ctrl -> Pdf : genererBonLivraison(vente)
+  Pdf --> Ctrl : fichier PDF
+  Ctrl --> Vue : confirmation et lien du bon de livraison
+  Vue --> Administrateur : livraison enregistrée
+else stock insuffisant
+  Svc --> Ctrl : StockInsuffisantException
+  Ctrl --> Vue : message « Stock insuffisant pour la ferme X »
+  Vue --> Administrateur : erreur, rien n'est enregistré
+end
+@enduml

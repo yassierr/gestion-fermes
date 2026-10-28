@@ -1,0 +1,146 @@
+Enum role_utilisateur {
+  ADMIN
+  RESPONSABLE
+  AGENT_RH
+}
+Enum statut_vente {
+  LIVREE
+  PAYEE
+  ANNULEE
+}
+Enum statut_pointage {
+  PRESENT
+  ABSENT
+}
+Enum type_client {
+  STATION_CONDITIONNEMENT
+  EXPORTATEUR
+  GROSSISTE
+  MARCHE_GROS
+}
+Enum categorie_depense {
+  PLANTS
+  ENGRAIS
+  EAU_ENERGIE
+  EMBALLAGE
+  AUTRE
+}
+
+Table ferme {
+  id serial [pk]
+  nom varchar(100) [not null, unique]
+  localisation varchar(150) [not null]
+}
+
+Table utilisateur {
+  id serial [pk]
+  nom_complet varchar(100) [not null]
+  login varchar(50) [not null, unique]
+  mot_de_passe_hash varchar(100) [not null]
+  role role_utilisateur [not null]
+  actif boolean [not null, default: true]
+  id_ferme int [ref: > ferme.id, note: 'vide pour ADMIN']
+}
+
+Table serre {
+  id serial [pk]
+  nom varchar(100) [not null]
+  surface_m2 numeric(10,2) [not null]
+  structure varchar(50)
+  irrigation varchar(50)
+  variete varchar(50)
+  id_ferme int [not null, ref: > ferme.id]
+  indexes {
+    (id_ferme, nom) [unique]
+  }
+}
+
+Table recolte {
+  id serial [pk]
+  date_heure timestamp [not null]
+  poids_kg numeric(10,2) [not null]
+  variete varchar(50) [not null]
+  id_ferme int [not null, ref: > ferme.id]
+}
+
+Table depense {
+  id serial [pk]
+  date_depense date [not null]
+  categorie categorie_depense [not null]
+  montant numeric(12,2) [not null]
+  description varchar(255)
+  id_ferme int [not null, ref: > ferme.id]
+}
+
+Table client {
+  id serial [pk]
+  code varchar(20) [not null, unique]
+  nom varchar(100) [not null]
+  type type_client [not null]
+  telephone varchar(30)
+  ville varchar(80)
+  actif boolean [not null, default: true]
+}
+
+Table vente {
+  id serial [pk]
+  numero_bon varchar(20) [not null, unique]
+  date_livraison date [not null]
+  statut statut_vente [not null]
+  date_paiement date
+  id_client int [not null, ref: > client.id]
+  id_admin int [not null, ref: > utilisateur.id]
+}
+
+Table ligne_vente {
+  id serial [pk]
+  quantite_kg numeric(10,2) [not null]
+  prix_kg numeric(10,2) [not null]
+  id_vente int [not null, ref: > vente.id]
+  id_ferme int [not null, ref: > ferme.id]
+}
+
+Table ouvrier {
+  id serial [pk]
+  matricule varchar(20) [not null, unique]
+  cin varchar(20) [not null, unique]
+  nom_prenom varchar(100) [not null]
+  telephone varchar(30)
+  adresse varchar(150)
+  poste varchar(50)
+  salaire_journalier numeric(8,2) [not null, default: 150]
+  actif boolean [not null, default: true]
+  id_serre int [ref: > serre.id]
+  id_ferme int [not null, ref: > ferme.id]
+}
+
+Table recu_paie {
+  id serial [pk]
+  numero varchar(20) [not null, unique]
+  date_paiement date [not null]
+  periode_debut date [not null]
+  periode_fin date [not null]
+  total numeric(12,2) [not null]
+  id_ferme int [not null, ref: > ferme.id]
+  id_agent_rh int [not null, ref: > utilisateur.id]
+}
+
+Table ligne_paie {
+  id serial [pk]
+  jours_payes int [not null]
+  salaire_journalier numeric(8,2) [not null]
+  montant numeric(12,2) [not null]
+  id_recu int [not null, ref: > recu_paie.id]
+  id_ouvrier int [not null, ref: > ouvrier.id]
+}
+
+Table pointage {
+  id serial [pk]
+  date_pointage date [not null]
+  statut statut_pointage [not null]
+  id_ouvrier int [not null, ref: > ouvrier.id]
+  id_recu int [ref: > recu_paie.id, note: 'vide tant que non payé']
+  indexes {
+    (id_ouvrier, date_pointage) [unique]
+  }
+}

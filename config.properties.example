@@ -1,0 +1,4 @@
+# Copier ce fichier en config.properties puis renseigner les valeurs
+db.url=jdbc:postgresql://localhost:5432/gestion_fermes
+db.user=postgres
+db.password=CHANGER_MOI

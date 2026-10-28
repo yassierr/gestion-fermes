@@ -1,0 +1,46 @@
+@startuml
+title Paiement groupé des ouvriers (agent RH)
+autonumber
+actor "Agent RH" as RH
+participant "Écran Paie\n(FXML)" as Vue
+participant "PaieController" as Ctrl
+participant "PaieService" as Svc
+participant "OuvrierDAO" as ODao
+participant "PaieDAO" as PDao
+participant "PdfUtil" as Pdf
+database "PostgreSQL" as DB
+
+RH -> Vue : ouvre l'écran de paie
+Vue -> Ctrl : charger les soldes
+Ctrl -> Svc : soldesOuvriers(ferme)
+Svc -> ODao : joursPresentsNonPayes(ferme)
+ODao -> DB : pointages PRESENT où id_recu est nul
+DB --> ODao : jours par ouvrier
+ODao --> Svc : ouvriers et jours
+Svc -> Svc : solde = jours x salaire journalier
+Svc --> Ctrl : soldes
+Ctrl --> Vue : tableau ouvrier / jours / solde
+RH -> Vue : clic sur « Payer les ouvriers »
+Vue -> Ctrl : confirmer le paiement
+Ctrl -> Svc : payerOuvriers(ferme)
+
+alt au moins un ouvrier a un solde > 0
+  Svc -> PDao : enregistrerPaie(ferme, lignes)
+  PDao -> DB : BEGIN
+  PDao -> DB : INSERT INTO recu_paie
+  PDao -> DB : INSERT INTO ligne_paie (une par ouvrier)
+  PDao -> DB : UPDATE pointage SET id_recu = ? (jours payés)
+  PDao -> DB : COMMIT
+  DB --> PDao : ok
+  PDao --> Svc : RecuPaie
+  Svc --> Ctrl : RecuPaie
+  Ctrl -> Pdf : genererRecuPaie(recu)
+  Pdf --> Ctrl : fichier PDF
+  Ctrl --> Vue : soldes remis à 0 et reçu disponible
+  Vue --> RH : paiement effectué
+else aucun solde à payer
+  Svc --> Ctrl : AucunSoldeException
+  Ctrl --> Vue : message « Aucun ouvrier à payer »
+end
+note over PDao, DB : En cas d'erreur, ROLLBACK : aucun reçu\net aucun pointage modifié.
+@enduml
