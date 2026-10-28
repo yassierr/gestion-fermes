@@ -1,0 +1,28 @@
+@startuml
+title Connexion et ouverture du menu selon le rôle
+autonumber
+actor Utilisateur
+participant "Écran Connexion\n(FXML)" as Vue
+participant "LoginController" as Ctrl
+participant "AuthService" as Svc
+participant "UtilisateurDAO" as Dao
+database "PostgreSQL" as DB
+
+Utilisateur -> Vue : saisit login et mot de passe
+Vue -> Ctrl : clic sur « Se connecter »
+Ctrl -> Svc : authentifier(login, motDePasse)
+Svc -> Dao : trouverParLogin(login)
+Dao -> DB : SELECT * FROM utilisateur WHERE login = ?
+DB --> Dao : ligne utilisateur
+Dao --> Svc : Utilisateur (ou null)
+alt utilisateur trouvé, actif et mot de passe correct (BCrypt)
+  Svc --> Ctrl : Utilisateur connecté
+  Ctrl -> Ctrl : mémoriser la session (rôle, ferme)
+  Ctrl -> Vue : ouvrir le menu selon le rôle
+  Vue --> Utilisateur : menu Administrateur, Responsable ou Agent RH
+else échec
+  Svc --> Ctrl : AuthException
+  Ctrl -> Vue : afficher « Identifiants incorrects »
+  Vue --> Utilisateur : message d'erreur
+end
+@enduml
