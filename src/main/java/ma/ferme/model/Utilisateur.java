@@ -76,18 +76,41 @@ public abstract class Utilisateur {
      * @return une instance de {@link Administrateur}, {@link ResponsableFerme} ou {@link AgentRH}
      * @throws IllegalArgumentException si les données sont invalides
      */
-    public static Utilisateur creer(int id, String nomComplet, String login, String motDePasseHash,
-                                    RoleUtilisateur role, boolean actif, Integer idFerme) {
+    public static Utilisateur creer(
+            int id,
+            String nomComplet,
+            String login,
+            String motDePasseHash,
+            RoleUtilisateur role,
+            boolean actif,
+            Integer idFerme
+    ) {
         Objects.requireNonNull(role, "Le rôle est obligatoire.");
-        return switch (role) {
-            case ADMIN -> new Administrateur(id, nomComplet, login, motDePasseHash, actif);
-            case RESPONSABLE -> new ResponsableFerme(id, nomComplet, login, motDePasseHash, actif,
-                    exigerFerme(idFerme));
-            case AGENT_RH -> new AgentRH(id, nomComplet, login, motDePasseHash, actif,
-                    exigerFerme(idFerme));
-        };
-    }
 
+        return switch (role) {
+            case ADMIN -> {
+                if (idFerme != null) {
+                    throw new IllegalArgumentException(
+                        "Un administrateur ne doit pas être associé à une ferme."
+                    );
+                }
+
+                yield new Administrateur(
+                    id, nomComplet, login, motDePasseHash, actif
+                );
+            }
+
+            case RESPONSABLE -> new ResponsableFerme(
+                id, nomComplet, login, motDePasseHash,
+                actif, exigerFerme(idFerme)
+            );
+
+            case AGENT_RH -> new AgentRH(
+                id, nomComplet, login, motDePasseHash,
+                actif, exigerFerme(idFerme)
+            );
+        };
+    }   
     // ------------------------------------------------------------------
     // Comportement propre à chaque rôle
     // ------------------------------------------------------------------
