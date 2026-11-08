@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Écran de connexion (maquette « 1. Connexion »).
+  Contrôleur : ma.ferme.controller.LoginController
+  Styles     : css/style.css (socle) + css/login.css (classes login-*)
+-->
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="ma.ferme.controller.LoginController"
+           styleClass="login-root" prefWidth="1000.0" prefHeight="700.0">
+
+    <stylesheets>
+        <URL value="@../css/style.css"/>
+        <URL value="@../css/login.css"/>
+    </stylesheets>
+
+    <!-- Carte de connexion -->
+    <VBox styleClass="login-card" alignment="TOP_LEFT" spacing="20.0"
+          maxWidth="480.0" minWidth="480.0" maxHeight="-Infinity">
+        <padding>
+            <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
+        </padding>
+
+        <!-- En-tête -->
+        <VBox spacing="6.0">
+            <Label text="Connexion" styleClass="login-title"/>
+            <Label text="Accédez à votre espace d'exploitation agricole" styleClass="login-subtitle"/>
+        </VBox>
+
+        <!-- Message d'erreur (caché tant qu'il n'y a pas d'erreur) -->
+        <Label fx:id="lblErreur" styleClass="login-error" wrapText="true"
+               maxWidth="Infinity" visible="false" managed="false"/>
+
+        <!-- Identifiant -->
+        <VBox spacing="6.0">
+            <HBox spacing="3.0" alignment="CENTER_LEFT">
+                <Label text="IDENTIFIANT" styleClass="login-label"/>
+                <Label text="*" styleClass="login-required"/>
+            </HBox>
+            <TextField fx:id="txtLogin" styleClass="login-field"
+                       promptText="responsable.agadir@fermes.ma"/>
+        </VBox>
+
+        <!-- Mot de passe : PasswordField + TextField superposés pour afficher/masquer -->
+        <VBox spacing="6.0">
+            <HBox spacing="3.0" alignment="CENTER_LEFT">
+                <Label text="MOT DE PASSE" styleClass="login-label"/>
+                <Label text="*" styleClass="login-required"/>
+            </HBox>
+            <StackPane alignment="CENTER_RIGHT">
+                <PasswordField fx:id="pfMotDePasse" styleClass="login-field, login-field-password"
+                               promptText="••••••••••••"/>
+                <TextField fx:id="txtMotDePasseVisible" styleClass="login-field, login-field-password"
+                           promptText="Mot de passe" visible="false" managed="false"/>
+                <Button fx:id="btnAfficher" text="Afficher" styleClass="login-eye"
+                        focusTraversable="false" onAction="#onBasculerMotDePasse">
+                    <StackPane.margin>
+                        <Insets right="6.0"/>
+                    </StackPane.margin>
+                </Button>
+            </StackPane>
+        </VBox>
+
+        <!-- Se souvenir de moi / Mot de passe oublié -->
+        <HBox alignment="CENTER_LEFT">
+            <CheckBox fx:id="chkSouvenir" text="Se souvenir de moi" styleClass="login-check"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Hyperlink fx:id="lienOublie" text="Mot de passe oublié ?" styleClass="login-link"
+                       onAction="#onMotDePasseOublie"/>
+        </HBox>
+
+        <!-- Bouton principal : Entrée déclenche la connexion -->
+        <Button fx:id="btnConnexion" text="Se connecter  →" styleClass="login-button"
+                defaultButton="true" maxWidth="Infinity" prefHeight="48.0"
+                onAction="#onConnexion"/>
+    </VBox>
+</StackPane>
