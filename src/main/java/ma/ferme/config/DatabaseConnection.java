@@ -18,7 +18,7 @@ import java.util.Properties;
  * Pour utiliser un autre fichier (ex. base de test), lancer la JVM avec
  * {@code -Dferme.config=config.test.properties}.
  *
- * @author Yassir Hikou
+ * @author Yassir 
  * @version 1.0
  */
 public final class DatabaseConnection {
