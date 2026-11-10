@@ -1,31 +1,51 @@
+
 package ma.ferme.model;
 
+/**
+ * Represente une ferme dans l'application.
+ */
 public class Ferme {
-    private static int counter = 1; // Counter to generate automatic IDs
-    
-    private final int id; // Read-only ID
+
+    private int id;
     private String nom;
     private String localisation;
 
     /**
-     * Default constructor. Automatically assigns a unique ID.
+     * Constructeur sans identifiant.
      */
     public Ferme() {
-        this.id = counter++;
     }
 
     /**
-     * Parameterized constructor (without ID, as it is automatic).
+     * Constructeur pour creer une nouvelle ferme.
+     *
+     * @param nom nom de la ferme
+     * @param localisation localisation de la ferme
      */
     public Ferme(String nom, String localisation) {
-        this.id = counter++;
         this.nom = nom;
         this.localisation = localisation;
     }
 
-    // Getter for ID (No setter, so it cannot be changed)
+    /**
+     * Constructeur utilise lors de la recuperation depuis la base.
+     *
+     * @param id identifiant de la ferme
+     * @param nom nom de la ferme
+     * @param localisation localisation de la ferme
+     */
+    public Ferme(int id, String nom, String localisation) {
+        this.id = id;
+        this.nom = nom;
+        this.localisation = localisation;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNom() {
@@ -44,8 +64,13 @@ public class Ferme {
         this.localisation = localisation;
     }
 
+    /**
+     * Retourne le stock disponible.
+     * A implementer dans une future evolution.
+     *
+     * @return stock disponible
+     */
     public double getStockDisponible() {
-        // TODO: Implement business logic
         return 0.0;
     }
 }
