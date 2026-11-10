@@ -2,6 +2,13 @@ package ma.ferme.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Ouvrier : cette classe permet l'agent RH de créer un identificateur d'un ouvrier dans le système,
+ * concernant ses informations et confirmant son état du travail.
+ * 
+ * @author JamelBoud
+ * @version 1.1
+ */
 public class Ouvrier {
     private int id;
     private String matricule;
@@ -16,6 +23,18 @@ public class Ouvrier {
     private boolean actif;
 
     // Constructeur 1 : Utilisé par le Formulaire FXML (Avant sauvegarde en base de données)
+    /**
+     * Un ouvrier peut avoir des parametres extérieurs comme 
+     * @param idFerme
+     * sinon tous ces paramètres représente ses informations personnelles.
+     * @param nom
+     * @param prenom
+     * @param cin
+     * @param telephone
+     * @param adresse
+     * @param poste
+     * @param salaireJournalier
+     */
     public Ouvrier(int idFerme, String nom, String prenom, String cin, String telephone, String adresse, String poste, BigDecimal salaireJournalier) {
 
         this.idFerme = idFerme;
@@ -45,6 +64,10 @@ public class Ouvrier {
     }
 
     // Méthode de génération du matricule si besoin
+    /**
+     * Chaque ouvrier est identifié par un identificateur dans le système,
+     * mais aussi avoir une matricule crée selon leur ID comme son propre ID personnel
+     */
     public void genererMatricule() {
         if (this.id > 0) {
             this.matricule = "AS-" + String.format("%04d", this.id);

@@ -3,6 +3,15 @@ package ma.ferme.model;
 import ma.ferme.model.enums.StatutPointage;
 import java.time.LocalDate;
 
+/**
+ * 
+ * Pointage des ouvriers: Cette classe permet L'agent RH de pointer le présence ou l'absence
+ *  d'un ouvrier dans une ferme/serre certaine.
+ * 
+ * @author JamelBoud
+ * @version 1.1
+ */
+
 public class Pointage {
     private int id;
     private int idOuvrier;
@@ -10,6 +19,13 @@ public class Pointage {
     private StatutPointage statut;
 
     // Constructeur 1 : Utilisé lors de la saisie par l'Agent RH (avant sauvegarde en BDD)
+    /**
+     * La classe Pointage importe:
+     * @param idOuvrier
+     * Comme un clé étranger. mais Ila son propre ID : @param id
+     * @param datePointage
+     * @param statut
+     */
     public Pointage(int idOuvrier, LocalDate datePointage, StatutPointage statut) {
         if (datePointage == null) {
             throw new IllegalArgumentException("La date de pointage ne peut pas être nulle");
