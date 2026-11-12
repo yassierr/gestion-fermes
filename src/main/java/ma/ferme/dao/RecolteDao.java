@@ -2,67 +2,64 @@ package ma.ferme.dao;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import ma.ferme.config.DatabaseConnection;
-import ma.ferme.model.Depense;
-import ma.ferme.model.enums.CategorieDepense;
+import ma.ferme.model.Recolte;
 
 /**
- * Accès à la table {@code depense}. La catégorie est un type énumérée PostgreSQL :
- * écriture avec {@code ?::categorie_depense}, lecture avec {@code valueOf}.
- * Requêtes paramétrées uniquement (ENF-03).
+ * Accès à la table {@code recolte} (CRUD et requêtes filtrées sur une ferme).
+ * Toutes les requêtes sont paramétrées (ENF-03). Aucune règle métier ici :
+ * le stock (RG-07) est vérifié par {@code RecolteService}.
  *
  * @author Mohamed Amine Ait Maait
  * @version 1.0
  */
-public class DepenseDao implements GenericDao<Depense> {
+public class RecolteDao implements GenericDao<Recolte> {
 
-    private static final String COLONNES = "id, date_depense, categorie, montant, description, id_ferme";
+    private static final String COLONNES = "id, date_heure, poids_kg, variete, id_ferme";
 
     /**
-     * Enregistre une dépense. L'identifiant généré par la base est recopié dans l'objet.
+     * Enregistre une récolte. L'identifiant généré par la base est recopié dans l'objet.
      *
-     * @param depense la dépense à enregistrer (son identifiant est renseigné au retour)
-     * @throws DaoException si l'insertion échoue
+     * @param recolte la récolte à enregistrer (son identifiant est renseigné au retour)
+     * @throws DaoException si l'insertion échoue (ferme inexistante, erreur SQL...)
      */
     @Override
-    public void insert(Depense depense) {
-        String sql = "INSERT INTO depense (date_depense, categorie, montant, description, id_ferme) "
-                + "VALUES (?, ?::categorie_depense, ?, ?, ?) RETURNING id";
+    public void insert(Recolte recolte) {
+        String sql = "INSERT INTO recolte (date_heure, poids_kg, variete, id_ferme) "
+                + "VALUES (?, ?, ?, ?) RETURNING id";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(depense.getDateDepense()));
-            ps.setString(2, depense.getCategorie().name());
-            ps.setBigDecimal(3, depense.getMontant());
-            ps.setString(4, depense.getDescription());
-            ps.setInt(5, depense.getIdFerme());
+            ps.setTimestamp(1, Timestamp.valueOf(recolte.getDateHeure()));
+            ps.setBigDecimal(2, recolte.getPoidsKg());
+            ps.setString(3, recolte.getVariete());
+            ps.setInt(4, recolte.getIdFerme());
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
-                depense.setId(rs.getInt(1));
+                recolte.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
-            throw new DaoException("Impossible d'enregistrer la dépense.", e);
+            throw new DaoException("Impossible d'enregistrer la récolte.", e);
         }
     }
 
     /**
-     * Cherche une dépense par son identifiant.
+     * Cherche une récolte par son identifiant.
      *
-     * @param id identifiant de la dépense
-     * @return la dépense, ou vide si elle n'existe pas
+     * @param id identifiant de la récolte
+     * @return la récolte, ou vide si elle n'existe pas
      * @throws DaoException en cas d'erreur SQL
      */
     @Override
-    public Optional<Depense> findById(int id) {
-        String sql = "SELECT " + COLONNES + " FROM depense WHERE id = ?";
+    public Optional<Recolte> findById(int id) {
+        String sql = "SELECT " + COLONNES + " FROM recolte WHERE id = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -70,115 +67,127 @@ public class DepenseDao implements GenericDao<Depense> {
                 return rs.next() ? Optional.of(lire(rs)) : Optional.empty();
             }
         } catch (SQLException e) {
-            throw new DaoException("Impossible de lire la dépense " + id + ".", e);
+            throw new DaoException("Impossible de lire la récolte " + id + ".", e);
         }
     }
 
     /**
-     * Liste les dépenses de toutes les fermes, les plus récentes d'abord.
+     * Liste les récoltes de toutes les fermes, les plus récentes d'abord.
      *
-     * @return la liste des dépenses
+     * @return la liste des récoltes
      * @throws DaoException en cas d'erreur SQL
      */
     @Override
-    public List<Depense> findAll() {
-        return lister("SELECT " + COLONNES + " FROM depense ORDER BY date_depense DESC, id DESC", null);
+    public List<Recolte> findAll() {
+        return lister("SELECT " + COLONNES + " FROM recolte ORDER BY date_heure DESC, id DESC", null);
     }
 
     /**
-     * Liste les dépenses d'une ferme, les plus récentes d'abord (EFR10).
+     * Liste les récoltes d'une ferme, les plus récentes d'abord (EFR07).
      *
      * @param idFerme identifiant de la ferme
-     * @return les dépenses de la ferme
+     * @return les récoltes de la ferme
      * @throws DaoException en cas d'erreur SQL
      */
-    public List<Depense> findByFerme(int idFerme) {
-        return lister("SELECT " + COLONNES + " FROM depense WHERE id_ferme = ? "
-                + "ORDER BY date_depense DESC, id DESC", idFerme);
+    public List<Recolte> findByFerme(int idFerme) {
+        return lister("SELECT " + COLONNES + " FROM recolte WHERE id_ferme = ? "
+                + "ORDER BY date_heure DESC, id DESC", idFerme);
     }
 
     /**
-     * Met à jour une dépense.
+     * Met à jour la date, le poids, la variété et la ferme d'une récolte.
      *
-     * @param depense la dépense avec ses nouvelles valeurs (identifiant obligatoire)
-     * @throws DaoException si la dépense n'existe pas ou en cas d'erreur SQL
+     * @param recolte la récolte avec ses nouvelles valeurs (identifiant obligatoire)
+     * @throws DaoException si la récolte n'existe pas ou en cas d'erreur SQL
      */
     @Override
-    public void update(Depense depense) {
-        String sql = "UPDATE depense SET date_depense = ?, categorie = ?::categorie_depense, "
-                + "montant = ?, description = ?, id_ferme = ? WHERE id = ?";
+    public void update(Recolte recolte) {
+        String sql = "UPDATE recolte SET date_heure = ?, poids_kg = ?, variete = ?, id_ferme = ? WHERE id = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(depense.getDateDepense()));
-            ps.setString(2, depense.getCategorie().name());
-            ps.setBigDecimal(3, depense.getMontant());
-            ps.setString(4, depense.getDescription());
-            ps.setInt(5, depense.getIdFerme());
-            ps.setInt(6, depense.getId());
+            ps.setTimestamp(1, Timestamp.valueOf(recolte.getDateHeure()));
+            ps.setBigDecimal(2, recolte.getPoidsKg());
+            ps.setString(3, recolte.getVariete());
+            ps.setInt(4, recolte.getIdFerme());
+            ps.setInt(5, recolte.getId());
             if (ps.executeUpdate() == 0) {
-                throw new DaoException("Dépense introuvable : " + depense.getId(), null);
+                throw new DaoException("Récolte introuvable : " + recolte.getId(), null);
             }
         } catch (SQLException e) {
-            throw new DaoException("Impossible de modifier la dépense " + depense.getId() + ".", e);
+            throw new DaoException("Impossible de modifier la récolte " + recolte.getId() + ".", e);
         }
     }
 
     /**
-     * Supprime une dépense.
+     * Supprime une récolte.
      *
-     * @param id identifiant de la dépense
-     * @throws DaoException si la dépense n'existe pas ou en cas d'erreur SQL
+     * @param id identifiant de la récolte
+     * @throws DaoException si la récolte n'existe pas ou en cas d'erreur SQL
      */
     @Override
     public void delete(int id) {
         try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement("DELETE FROM depense WHERE id = ?")) {
+             PreparedStatement ps = c.prepareStatement("DELETE FROM recolte WHERE id = ?")) {
             ps.setInt(1, id);
             if (ps.executeUpdate() == 0) {
-                throw new DaoException("Dépense introuvable : " + id, null);
+                throw new DaoException("Récolte introuvable : " + id, null);
             }
         } catch (SQLException e) {
-            throw new DaoException("Impossible de supprimer la dépense " + id + ".", e);
+            throw new DaoException("Impossible de supprimer la récolte " + id + ".", e);
         }
     }
 
     /**
-     * Total des dépenses d'une ferme entre deux dates incluses.
-     * Une borne {@code null} signifie « sans limite de ce côté ».
+     * Somme des poids récoltés par une ferme (zéro si aucune récolte).
      *
      * @param idFerme identifiant de la ferme
-     * @param debut   première date prise en compte, ou {@code null}
-     * @param fin     dernière date prise en compte, ou {@code null}
-     * @return le total en MAD (zéro si aucune dépense)
+     * @return le total en kg
      * @throws DaoException en cas d'erreur SQL
      */
-    public BigDecimal total(int idFerme, LocalDate debut, LocalDate fin) {
-        String sql = "SELECT COALESCE(SUM(montant), 0) FROM depense WHERE id_ferme = ? "
-                + "AND (?::date IS NULL OR date_depense >= ?::date) "
-                + "AND (?::date IS NULL OR date_depense <= ?::date)";
+    public BigDecimal totalKg(int idFerme) {
+        String sql = "SELECT COALESCE(SUM(poids_kg), 0) FROM recolte WHERE id_ferme = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, idFerme);
-            lier(ps, 2, debut);
-            lier(ps, 4, fin);
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
                 return rs.getBigDecimal(1);
             }
         } catch (SQLException e) {
-            throw new DaoException("Impossible de calculer le total des dépenses.", e);
+            throw new DaoException("Impossible de calculer le total récolté.", e);
         }
     }
 
-    /** Lie une date (ou NULL) à deux paramètres consécutifs. */
-    private static void lier(PreparedStatement ps, int index, LocalDate date) throws SQLException {
-        Date valeur = date == null ? null : Date.valueOf(date);
-        ps.setDate(index, valeur);
-        ps.setDate(index + 1, valeur);
+    /**
+     * Variétés connues d'une ferme : celles de ses récoltes et celles de ses serres,
+     * sans doublon, par ordre alphabétique. Alimente la liste déroulante du formulaire.
+     *
+     * @param idFerme identifiant de la ferme
+     * @return les variétés connues
+     * @throws DaoException en cas d'erreur SQL
+     */
+    public List<String> varietes(int idFerme) {
+        String sql = "SELECT variete FROM recolte WHERE id_ferme = ? "
+                + "UNION SELECT variete FROM serre WHERE id_ferme = ? AND variete IS NOT NULL AND variete <> '' "
+                + "ORDER BY 1";
+        List<String> varietes = new ArrayList<>();
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, idFerme);
+            ps.setInt(2, idFerme);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    varietes.add(rs.getString(1));
+                }
+            }
+            return varietes;
+        } catch (SQLException e) {
+            throw new DaoException("Impossible de lire les variétés.", e);
+        }
     }
 
-    private List<Depense> lister(String sql, Integer idFerme) {
-        List<Depense> depenses = new ArrayList<>();
+    private List<Recolte> lister(String sql, Integer idFerme) {
+        List<Recolte> recoltes = new ArrayList<>();
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             if (idFerme != null) {
@@ -186,22 +195,21 @@ public class DepenseDao implements GenericDao<Depense> {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    depenses.add(lire(rs));
+                    recoltes.add(lire(rs));
                 }
             }
-            return depenses;
+            return recoltes;
         } catch (SQLException e) {
-            throw new DaoException("Impossible de lister les dépenses.", e);
+            throw new DaoException("Impossible de lister les récoltes.", e);
         }
     }
 
-    private Depense lire(ResultSet rs) throws SQLException {
-        return new Depense(
+    private Recolte lire(ResultSet rs) throws SQLException {
+        return new Recolte(
                 rs.getInt("id"),
-                rs.getDate("date_depense").toLocalDate(),
-                CategorieDepense.valueOf(rs.getString("categorie")),
-                rs.getBigDecimal("montant"),
-                rs.getString("description"),
+                rs.getTimestamp("date_heure").toLocalDateTime(),
+                rs.getBigDecimal("poids_kg"),
+                rs.getString("variete"),
                 rs.getInt("id_ferme"));
     }
 }
