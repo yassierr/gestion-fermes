@@ -177,14 +177,6 @@ class UtilisateurTest {
                 ));
     }
 
-    private Administrateur adminAvecFerme() {
-        return new Administrateur(
-                1, "Ahmed", "ahmed", "hash", true
-        ) {
-            // Administrateur n'accepte pas de ferme.
-        };
-    }
-
 
     // 5. Test Factory creer()
 
