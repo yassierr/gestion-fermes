@@ -13,8 +13,7 @@ public class Ouvrier {
     private int id;
     private String matricule;
     private int idFerme;
-    private String nom;
-    private String prenom;
+    private String nom_prenom;
     private String cin;
     private String telephone;
     private String adresse;
@@ -27,19 +26,17 @@ public class Ouvrier {
      * Un ouvrier peut avoir des parametres extérieurs comme 
      * @param idFerme
      * sinon tous ces paramètres représente ses informations personnelles.
-     * @param nom
-     * @param prenom
+     * @param nom_prenom
      * @param cin
      * @param telephone
      * @param adresse
      * @param poste
      * @param salaireJournalier
      */
-    public Ouvrier(int idFerme, String nom, String prenom, String cin, String telephone, String adresse, String poste, BigDecimal salaireJournalier) {
+    public Ouvrier(int idFerme, String nom_prenom, String cin, String telephone, String adresse, String poste, BigDecimal salaireJournalier) {
 
         this.idFerme = idFerme;
-        setNom(nom);
-        setPrenom(prenom);
+        setNomEtPrenom(nom_prenom);
         setCin(cin);
         setTelephone(telephone);
         setAdresse(adresse);
@@ -49,12 +46,11 @@ public class Ouvrier {
     }
 
     // Constructeur 2 : Utilisé par le OuvrierDao lors de la lecture depuis PostgreSQL
-    public Ouvrier(int id, String matricule, int idFerme, String nom, String prenom, String cin, String telephone, String adresse, String poste, BigDecimal salaireJournalier, boolean actif) {
+    public Ouvrier(int id, String matricule, int idFerme, String nom_prenom, String cin, String telephone, String adresse, String poste, BigDecimal salaireJournalier, boolean actif) {
         this.id = id;
         this.matricule = matricule;
         this.idFerme = idFerme;
-        this.nom = nom;
-        this.prenom = prenom;
+        this.nom_prenom = nom_prenom;
         this.cin = cin;
         this.telephone = telephone;
         this.adresse = adresse;
@@ -86,8 +82,7 @@ public class Ouvrier {
     public int getId() { return id; }
     public String getMatricule() { return matricule; }
     public int getIdFerme() { return idFerme; }
-    public String getNom() { return nom; }
-    public String getPrenom() { return prenom; }
+    public String getNomEtPrenom() { return nom_prenom; }
     public String getCin() { return cin; }
     public String getTelephone() { return telephone; }
     public String getAdresse() { return adresse; }
@@ -101,17 +96,11 @@ public class Ouvrier {
         genererMatricule(); 
     }
     public void setIdFerme(int idFerme) { this.idFerme = idFerme; }
-    public void setNom(String nom) {
-        if (nom == null || nom.isBlank()){
-            throw new IllegalArgumentException("le nom ne doît pas être vide.");
+    public void setNomEtPrenom(String nom_prenom) {
+        if (nom_prenom == null || nom_prenom.isBlank()){
+            throw new IllegalArgumentException("le nom/prenom ne doît pas être vide.");
         }
-        else this.nom = nom;
-    }
-    public void setPrenom(String prenom) {
-        if (prenom ==null || prenom.isBlank()){
-            throw new IllegalArgumentException("le prènom ne doît pas être vide.");
-        }
-        else this.prenom = prenom;
+        else this.nom_prenom = nom_prenom;
     }
     public void setCin(String cin) {
         if (cin == null || cin.isBlank()){
