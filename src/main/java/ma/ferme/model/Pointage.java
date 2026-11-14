@@ -49,8 +49,6 @@ public class Pointage {
         switch (statut) {
             case PRESENT:
                 return 1.0;
-            case DEMI_JOURNEE:
-                return 0.5;
             case ABSENT:
             default:
                 return 0.0;

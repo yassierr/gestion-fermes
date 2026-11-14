@@ -26,7 +26,7 @@ class PointageDaoTest {
         pointageDao = new PointageDao();
         ouvrierDao = new OuvrierDao();
 
-        Ouvrier ouvrier = new Ouvrier(1, "TestPointage", "Ouvrier", "TEST999", "0699999999", "Biougra", "Test", new BigDecimal("150.00"));
+        Ouvrier ouvrier = new Ouvrier(1, "TestPointage", "TEST999", "0699999999", "Biougra", "Test", new BigDecimal("150.00"));
         ouvrierDao.insert(ouvrier);
         idOuvrierTest = ouvrier.getId();
     }
@@ -52,13 +52,13 @@ class PointageDaoTest {
     @Test
     @DisplayName("Devrait rechercher un pointage par ID")
     void testFindById() {
-        Pointage pointage = new Pointage(idOuvrierTest, LocalDate.now(), StatutPointage.DEMI_JOURNEE);
+        Pointage pointage = new Pointage(idOuvrierTest, LocalDate.now(), StatutPointage.ABSENT);
         pointageDao.insert(pointage);
 
         Optional<Pointage> trouve = pointageDao.findById(pointage.getId());
 
         assertTrue(trouve.isPresent());
-        assertEquals(StatutPointage.DEMI_JOURNEE, trouve.get().getStatut());
+        assertEquals(StatutPointage.ABSENT, trouve.get().getStatut());
     }
 
     @Test

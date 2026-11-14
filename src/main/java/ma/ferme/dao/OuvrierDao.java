@@ -12,8 +12,8 @@ public class OuvrierDao implements GenericDao<Ouvrier> {
 
     @Override
     public void insert(Ouvrier ouvrier) {
-        String sqlInsert = "INSERT INTO ouvrier (matricule, id_ferme, nom, prenom, cin, telephone, adresse, poste, salaire_journalier, actif) "
-                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+        String sqlInsert = "INSERT INTO ouvrier (matricule, id_ferme, nom_prenom, cin, telephone, adresse, poste, salaire_journalier, actif) "
+                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
         String sqlUpdateMat = "UPDATE ouvrier SET matricule = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -25,14 +25,13 @@ public class OuvrierDao implements GenericDao<Ouvrier> {
             try (PreparedStatement stmt = conn.prepareStatement(sqlInsert)) {
                 stmt.setString(1, tempMatricule);
                 stmt.setInt(2, ouvrier.getIdFerme());
-                stmt.setString(3, ouvrier.getNom());
-                stmt.setString(4, ouvrier.getPrenom());
-                stmt.setString(5, ouvrier.getCin());
-                stmt.setString(6, ouvrier.getTelephone());
-                stmt.setString(7, ouvrier.getAdresse());
-                stmt.setString(8, ouvrier.getPoste());
-                stmt.setBigDecimal(9, ouvrier.getSalaireJournalier());
-                stmt.setBoolean(10, ouvrier.isActif());
+                stmt.setString(3, ouvrier.getNomEtPrenom());
+                stmt.setString(4, ouvrier.getCin());
+                stmt.setString(5, ouvrier.getTelephone());
+                stmt.setString(6, ouvrier.getAdresse());
+                stmt.setString(7, ouvrier.getPoste());
+                stmt.setBigDecimal(8, ouvrier.getSalaireJournalier());
+                stmt.setBoolean(9, ouvrier.isActif());
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
@@ -50,7 +49,7 @@ public class OuvrierDao implements GenericDao<Ouvrier> {
             }
 
         } catch (SQLException e) {
-            throw new DaoException("Erreur lors de l'insertion de l'ouvrier: " + ouvrier.getNom(), e);
+            throw new DaoException("Erreur lors de l'insertion de l'ouvrier: " + ouvrier.getNomEtPrenom(), e);
         }
     }
 
@@ -117,21 +116,20 @@ public class OuvrierDao implements GenericDao<Ouvrier> {
 
     @Override
     public void update(Ouvrier ouvrier) {
-        String sql = "UPDATE ouvrier SET id_ferme = ?, nom = ?, prenom = ?, cin = ?, telephone = ?, adresse = ?, poste = ?, salaire_journalier = ?, actif = ? WHERE id = ?";
+        String sql = "UPDATE ouvrier SET id_ferme = ?, nom_prenom = ?, cin = ?, telephone = ?, adresse = ?, poste = ?, salaire_journalier = ?, actif = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, ouvrier.getIdFerme());
-            stmt.setString(2, ouvrier.getNom());
-            stmt.setString(3, ouvrier.getPrenom());
-            stmt.setString(4, ouvrier.getCin());
-            stmt.setString(5, ouvrier.getTelephone());
-            stmt.setString(6, ouvrier.getAdresse());
-            stmt.setString(7, ouvrier.getPoste());
-            stmt.setBigDecimal(8, ouvrier.getSalaireJournalier());
-            stmt.setBoolean(9, ouvrier.isActif());
-            stmt.setInt(10, ouvrier.getId());
+            stmt.setString(2, ouvrier.getNomEtPrenom());
+            stmt.setString(3, ouvrier.getCin());
+            stmt.setString(4, ouvrier.getTelephone());
+            stmt.setString(5, ouvrier.getAdresse());
+            stmt.setString(6, ouvrier.getPoste());
+            stmt.setBigDecimal(7, ouvrier.getSalaireJournalier());
+            stmt.setBoolean(8, ouvrier.isActif());
+            stmt.setInt(9, ouvrier.getId());
 
             stmt.executeUpdate();
 
@@ -160,8 +158,7 @@ public class OuvrierDao implements GenericDao<Ouvrier> {
             rs.getInt("id"),
             rs.getString("matricule"),
             rs.getInt("id_ferme"),
-            rs.getString("nom"),
-            rs.getString("prenom"),
+            rs.getString("nom_prenom"),
             rs.getString("cin"),
             rs.getString("telephone"),
             rs.getString("adresse"),
