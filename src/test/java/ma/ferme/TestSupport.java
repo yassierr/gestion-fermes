@@ -45,10 +45,8 @@ public final class TestSupport {
     public static int premierId(String sql) {
         try (Connection c = DatabaseConnection.getConnection();
              ResultSet rs = c.createStatement().executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-            throw new IllegalStateException("Aucun enregistrement trouvé pour la requête : " + sql);
+            rs.next();
+            return rs.getInt(1);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
