@@ -1,0 +1,120 @@
+/* Styles de l'écran de connexion (login.fxml).
+   Couleurs reprises de la maquette : vert #2E6B34, survol #245529, fond #EAF3E6. */
+
+.login-root {
+    -fx-background-color: #EAF3E6;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: #D1FAE5;
+    -fx-border-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(2, 44, 34, 0.15), 30, 0.1, 0, 12);
+}
+
+.login-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.login-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748B;
+}
+
+.login-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.login-required {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #EF4444;
+}
+
+.login-field {
+    -fx-background-color: white;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 0 14 0 14;
+    -fx-pref-height: 46;
+    -fx-font-size: 14px;
+    -fx-text-fill: #0F172A;
+    -fx-prompt-text-fill: #94A3B8;
+}
+
+.login-field-password {
+    -fx-padding: 0 80 0 14;
+}
+
+.login-field:focused {
+    -fx-border-color: #2E6B34;
+    -fx-effect: dropshadow(gaussian, rgba(46, 107, 52, 0.30), 6, 0.3, 0, 0);
+}
+
+.login-eye {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.login-eye:hover {
+    -fx-text-fill: #2E6B34;
+}
+
+.login-check {
+    -fx-font-size: 13px;
+    -fx-text-fill: #475569;
+    -fx-cursor: hand;
+}
+
+.login-check:selected .box {
+    -fx-background-color: #2E6B34;
+}
+
+.login-link {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+    -fx-border-color: transparent;
+}
+
+.login-link:hover {
+    -fx-text-fill: #245529;
+    -fx-underline: true;
+}
+
+.login-button {
+    -fx-background-color: #2E6B34;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 6, 0.1, 0, 2);
+}
+
+.login-button:hover {
+    -fx-background-color: #245529;
+}
+
+.login-button:disabled {
+    -fx-opacity: 0.6;
+}
+
+.login-error {
+    -fx-background-color: #FEF2F2;
+    -fx-border-color: #FECACA;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14 10 14;
+    -fx-text-fill: #B91C1C;
+    -fx-font-size: 13px;
+}
