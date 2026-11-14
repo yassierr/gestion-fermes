@@ -13,7 +13,7 @@ DROP TYPE  IF EXISTS role_utilisateur, statut_vente, statut_pointage,
 -- ---------- Types énumérés ----------
 CREATE TYPE role_utilisateur  AS ENUM ('ADMIN', 'RESPONSABLE', 'AGENT_RH');
 CREATE TYPE statut_vente      AS ENUM ('LIVREE', 'PAYEE', 'ANNULEE');
-CREATE TYPE statut_pointage   AS ENUM ('PRESENT', 'ABSENT');
+CREATE TYPE statut_pointage   AS ENUM ('PRESENT', 'DEMI_JOURNEE', 'ABSENT');
 CREATE TYPE type_client       AS ENUM ('STATION_CONDITIONNEMENT', 'EXPORTATEUR', 'GROSSISTE', 'MARCHE_GROS');
 CREATE TYPE categorie_depense AS ENUM ('PLANTS', 'ENGRAIS', 'EAU_ENERGIE', 'EMBALLAGE', 'AUTRE');
 
@@ -103,7 +103,8 @@ CREATE TABLE ouvrier (
     id                  SERIAL PRIMARY KEY,
     matricule           VARCHAR(20)  NOT NULL UNIQUE,
     cin                 VARCHAR(20)  NOT NULL UNIQUE,
-    nom_prenom          VARCHAR(100) NOT NULL,
+    nom                 VARCHAR(50) NOT NULL,
+    prenom              VARCHAR(50) NOT NULL,
     telephone           VARCHAR(30),
     adresse             VARCHAR(150),
     poste               VARCHAR(50),
