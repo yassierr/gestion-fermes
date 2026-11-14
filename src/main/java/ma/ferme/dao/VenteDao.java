@@ -86,8 +86,10 @@ public class VenteDao implements GenericDao<Vente> {
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, prefix + "%");
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return prefix + String.format("%04d", rs.getInt(1));
+                if (rs.next()) {
+                    return prefix + String.format("%04d", rs.getInt(1));
+                }
+                return prefix + "0001";
             }
         }
     }
@@ -103,8 +105,10 @@ public class VenteDao implements GenericDao<Vente> {
             ps.setInt(5, v.getIdClient());
             ps.setInt(6, v.getIdAdmin());
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getInt(1);
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                throw new SQLException("Échec de la récupération de l'ID de la vente insérée.");
             }
         }
     }
@@ -119,8 +123,11 @@ public class VenteDao implements GenericDao<Vente> {
                 ps.setInt(3, idVente);
                 ps.setInt(4, l.getIdFerme());
                 try (ResultSet rs = ps.executeQuery()) {
-                    rs.next();
-                    ids.add(rs.getInt(1));
+                    if (rs.next()) {
+                        ids.add(rs.getInt(1));
+                    } else {
+                        throw new SQLException("Échec de la récupération de l'ID de la ligne de vente insérée.");
+                    }
                 }
             }
         }
@@ -217,8 +224,10 @@ public class VenteDao implements GenericDao<Vente> {
             ps.setInt(1, idFerme);
             ps.setInt(2, idFerme);
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getBigDecimal(1);
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+                return BigDecimal.ZERO;
             }
         } catch (SQLException e) {
             throw new DaoException("Calcul du stock impossible : " + e.getMessage(), e);
@@ -258,8 +267,10 @@ public class VenteDao implements GenericDao<Vente> {
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            rs.next();
-            return rs.getBigDecimal(1);
+            if (rs.next()) {
+                return rs.getBigDecimal(1);
+            }
+            return BigDecimal.ZERO;
         } catch (SQLException e) {
             throw new DaoException("Calcul du montant impossible : " + e.getMessage(), e);
         }
