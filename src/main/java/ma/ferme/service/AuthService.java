@@ -70,26 +70,25 @@ public class AuthService {
         return utilisateur;
     }
 
-    /**
+       /**
      * Compare un mot de passe en clair à un hash BCrypt. Un hash absent ou mal formé
-     * (par exemple une valeur de test comme « dummy_hash » dans data.sql) donne {@code false}
-     * au lieu de lever une exception.
-     * <p>
-     * Seul endroit qui appelle {@code PasswordUtil.verifier} : à adapter si le nom de la méthode diffère.
-     * </p>
+     * (par exemple « dummy_hash » dans data.sql) donne {@code false} sans lever d'exception.
      *
      * @param motDePasseClair le mot de passe saisi
      * @param hash            le hash stocké en base
      * @return {@code true} si le mot de passe correspond au hash
      */
     static boolean motDePasseCorrect(String motDePasseClair, String hash) {
-        if (hash == null || motDePasseClair == null) {
-            return false;
-        }
-        try {
-            return PasswordUtil.verifier(motDePasseClair, hash);
-        } catch (IllegalArgumentException e) {
-            return false;
+        return PasswordUtil.verify(motDePasseClair, hash);
+
+    }
+        /** Erreur fonctionnelle rencontrée lors de l'authentification. */
+    public static class AuthException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
+        public AuthException(String message) {
+            super(message);
         }
     }
 }
