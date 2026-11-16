@@ -1,5 +1,7 @@
 package ma.ferme.dao;
 
+import ma.ferme.config.DatabaseConnection;
+import ma.ferme.TestSupport;
 import ma.ferme.model.Ouvrier;
 import ma.ferme.model.Pointage;
 import ma.ferme.model.enums.StatutPointage;
@@ -9,35 +11,68 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class PointageDaoTest {
 
     private PointageDao pointageDao;
     private OuvrierDao ouvrierDao;
+    private int idFermeTest;
     private int idOuvrierTest;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
+        assumeTrue(TestSupport.baseDisponible(), "Base de données PostgreSQL indisponible");
         pointageDao = new PointageDao();
         ouvrierDao = new OuvrierDao();
 
-        Ouvrier ouvrier = new Ouvrier(1, "TestPointage", "TEST999", "0699999999", "Biougra", "Test", new BigDecimal("150.00"));
+        idFermeTest = creerFermeTest();
+
+        String cinUnique = "P" + (System.nanoTime() % 1_000_000_000L);
+        Ouvrier ouvrier = new Ouvrier(idFermeTest, "TestPointage", cinUnique, "0699999999", "Biougra", "Test", new BigDecimal("150.00"));
         ouvrierDao.insert(ouvrier);
         idOuvrierTest = ouvrier.getId();
     }
 
     @AfterEach
-    void tearDown() {
-        // Supprime d'abord les pointages liés (clé étrangère), puis l'ouvrier de test
+    void tearDown() throws SQLException {
+        // Ordre inverse des clés étrangères : pointage -> ouvrier -> ferme
         for (Pointage p : pointageDao.findByOuvrier(idOuvrierTest)) {
             pointageDao.delete(p.getId());
         }
         ouvrierDao.delete(idOuvrierTest);
+        supprimerFermeTest(idFermeTest);
+    }
+
+    private int creerFermeTest() throws SQLException {
+        String sql = "INSERT INTO ferme (nom, localisation) VALUES (?, ?) RETURNING id";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "Ferme PointageDaoTest " + System.nanoTime());
+            stmt.setString(2, "Biougra");
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return rs.getInt("id");
+            }
+        }
+    }
+
+    private void supprimerFermeTest(int idFerme) throws SQLException {
+        String sql = "DELETE FROM ferme WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idFerme);
+            stmt.executeUpdate();
+        }
     }
 
     @Test
