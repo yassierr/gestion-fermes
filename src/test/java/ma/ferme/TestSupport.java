@@ -42,15 +42,33 @@ public final class TestSupport {
      * @param sql requete SELECT
      * @return la premiere valeur de la premiere ligne
      */
+    // public static int premierId(String sql) {
+    //     try (Connection c = DatabaseConnection.getConnection();
+    //          ResultSet rs = c.createStatement().executeQuery(sql)) {
+    //         rs.next();
+    //         return rs.getInt(1);
+    //     } catch (SQLException e) {
+    //         throw new IllegalStateException(e);
+    //     }
+    // }
+
     public static int premierId(String sql) {
-        try (Connection c = DatabaseConnection.getConnection();
-             ResultSet rs = c.createStatement().executeQuery(sql)) {
-            rs.next();
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
+    try (Connection c = DatabaseConnection.getConnection();
+         var stmt = c.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+
+        if (!rs.next()) {
+            throw new IllegalStateException(
+                "No result found for query: " + sql
+            );
         }
+
+        return rs.getInt(1);
+
+    } catch (SQLException e) {
+        throw new IllegalStateException(e);
     }
+}
 
     /**
      * Execute une instruction SQL (preparation / nettoyage des tests).
