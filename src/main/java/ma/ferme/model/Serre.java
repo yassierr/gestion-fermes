@@ -1,36 +1,55 @@
+
 package ma.ferme.model;
+
+/**
+ * Represente une serre appartenant a une ferme.
+ */
 public class Serre {
-    private static int counter = 1; // Counter to generate automatic IDs
-    
-    private final int id; // Read-only ID
+
+    private int id;
     private String nom;
     private double surfaceM2;
     private String variete;
     private String typeAbri;
     private String irrigation;
+    private int idFerme;
 
-    /**
-     * Default constructor. Automatically assigns a unique ID.
-     */
     public Serre() {
-        this.id = counter++;
     }
 
     /**
-     * Parameterized constructor (without ID, as it is automatic).
+     * Constructeur pour creer une nouvelle serre.
      */
-    public Serre(String nom, double surfaceM2, String variete, String typeAbri, String irrigation) {
-        this.id = counter++;
+    public Serre(String nom, double surfaceM2, String variete,
+                 String typeAbri, String irrigation, int idFerme) {
         this.nom = nom;
         this.surfaceM2 = surfaceM2;
         this.variete = variete;
         this.typeAbri = typeAbri;
         this.irrigation = irrigation;
+        this.idFerme = idFerme;
     }
 
-    // Getter for ID (No setter, so it cannot be changed)
+    /**
+     * Constructeur utilise lors de la recuperation depuis la base.
+     */
+    public Serre(int id, String nom, double surfaceM2, String variete,
+                 String typeAbri, String irrigation, int idFerme) {
+        this.id = id;
+        this.nom = nom;
+        this.surfaceM2 = surfaceM2;
+        this.variete = variete;
+        this.typeAbri = typeAbri;
+        this.irrigation = irrigation;
+        this.idFerme = idFerme;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNom() {
@@ -71,5 +90,13 @@ public class Serre {
 
     public void setIrrigation(String irrigation) {
         this.irrigation = irrigation;
+    }
+
+    public int getIdFerme() {
+        return idFerme;
+    }
+
+    public void setIdFerme(int idFerme) {
+        this.idFerme = idFerme;
     }
 }

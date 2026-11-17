@@ -1,7 +1,7 @@
 package ma.ferme.model;
 
-
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FermeTest {
@@ -10,51 +10,50 @@ class FermeTest {
     void testDefaultConstructor() {
         Ferme ferme = new Ferme();
 
-        assertTrue(ferme.getId() > 0);
+        assertEquals(0, ferme.getId());
         assertNull(ferme.getNom());
         assertNull(ferme.getLocalisation());
     }
 
     @Test
     void testParameterizedConstructor() {
-        Ferme ferme = new Ferme("Ferme Atlas", "Taroudant");
+        Ferme ferme = new Ferme("Ferme A", "Agadir");
 
-        assertTrue(ferme.getId() > 0);
-        assertEquals("Ferme Atlas", ferme.getNom());
+        assertEquals(0, ferme.getId());
+        assertEquals("Ferme A", ferme.getNom());
+        assertEquals("Agadir", ferme.getLocalisation());
+    }
+
+    @Test
+    void testParameterizedConstructorWithId() {
+        Ferme ferme = new Ferme(10, "Ferme B", "Taroudant");
+
+        assertEquals(10, ferme.getId());
+        assertEquals("Ferme B", ferme.getNom());
         assertEquals("Taroudant", ferme.getLocalisation());
+    }
+
+    @Test
+    void testSetId() {
+        Ferme ferme = new Ferme();
+        ferme.setId(5);
+
+        assertEquals(5, ferme.getId());
     }
 
     @Test
     void testSetNom() {
         Ferme ferme = new Ferme();
+        ferme.setNom("Ferme C");
 
-        ferme.setNom("Ferme Atlas");
-
-        assertEquals("Ferme Atlas", ferme.getNom());
+        assertEquals("Ferme C", ferme.getNom());
     }
 
     @Test
     void testSetLocalisation() {
         Ferme ferme = new Ferme();
+        ferme.setLocalisation("Marrakech");
 
-        ferme.setLocalisation("Agadir");
-
-        assertEquals("Agadir", ferme.getLocalisation());
-    }
-
-    @Test
-    void testAutomaticIdGeneration() {
-        Ferme ferme1 = new Ferme();
-        Ferme ferme2 = new Ferme();
-
-        assertTrue(ferme2.getId() > ferme1.getId());
-    }
-
-    @Test
-    void testGetStockDisponible() {
-        Ferme ferme = new Ferme();
-
-        assertEquals(0.0, ferme.getStockDisponible());
+        assertEquals("Marrakech", ferme.getLocalisation());
     }
 }
-
