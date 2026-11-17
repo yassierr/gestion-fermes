@@ -6,6 +6,7 @@ import java.util.List;
 import ma.ferme.dao.RecolteDao;
 import ma.ferme.model.Recolte;
 import ma.ferme.model.Utilisateur;
+import ma.ferme.model.enums.RoleUtilisateur;
 
 /**
  * Règles métier des récoltes (EFR06 à EFR08), réservées au responsable de la ferme.
@@ -52,7 +53,7 @@ public class RecolteService {
      * @throws IllegalArgumentException si le poids ou la variété est invalide
      */
     public Recolte enregistrer(Utilisateur acteur, BigDecimal poidsKg, String variete) {
-        int idFerme = Droits.fermeDuResponsable(acteur);
+        int idFerme = fermeDuResponsable(acteur);
         Recolte recolte = new Recolte(idFerme, poidsKg, variete);
         dao.insert(recolte);
         return recolte;
@@ -70,7 +71,7 @@ public class RecolteService {
      * @throws IllegalStateException    si le stock deviendrait négatif (RG-07)
      */
     public void modifier(Utilisateur acteur, int idRecolte, BigDecimal poidsKg, String variete) {
-        int idFerme = Droits.fermeDuResponsable(acteur);
+        int idFerme = fermeDuResponsable(acteur);
         Recolte recolte = trouver(idRecolte, idFerme);
         BigDecimal ancienPoids = recolte.getPoidsKg();
         recolte.setPoidsKg(poidsKg);
@@ -89,7 +90,7 @@ public class RecolteService {
      * @throws IllegalStateException    si le stock deviendrait négatif (RG-07)
      */
     public void supprimer(Utilisateur acteur, int idRecolte) {
-        int idFerme = Droits.fermeDuResponsable(acteur);
+        int idFerme = fermeDuResponsable(acteur);
         Recolte recolte = trouver(idRecolte, idFerme);
         verifierStock(idFerme, recolte.getPoidsKg().negate(), "supprimer");
         dao.delete(idRecolte);
@@ -102,7 +103,7 @@ public class RecolteService {
      * @return les récoltes de sa ferme
      */
     public List<Recolte> lister(Utilisateur acteur) {
-        return dao.findByFerme(Droits.fermeDuResponsable(acteur));
+        return dao.findByFerme(fermeDuResponsable(acteur));
     }
 
     /**
@@ -122,13 +123,13 @@ public class RecolteService {
      * @return les variétés connues, par ordre alphabétique
      */
     public List<String> varietes(Utilisateur acteur) {
-        return dao.varietes(Droits.fermeDuResponsable(acteur));
+        return dao.varietes(fermeDuResponsable(acteur));
     }
 
     private Recolte trouver(int idRecolte, int idFerme) {
         Recolte recolte = dao.findById(idRecolte)
                 .orElseThrow(() -> new IllegalArgumentException("Cette récolte n'existe plus."));
-        Droits.exigerMemeFerme(recolte.getIdFerme(), idFerme);
+        exigerMemeFerme(recolte.getIdFerme(), idFerme);
         return recolte;
     }
 
@@ -138,6 +139,24 @@ public class RecolteService {
         if (stock.add(variation).signum() < 0) {
             throw new IllegalStateException("Impossible de " + action + " cette récolte : le stock de la ferme "
                     + "(" + stock.toPlainString() + " kg) deviendrait négatif, car ces kg ont déjà été livrés.");
+        }
+    }
+
+    /** Vérifie que l'acteur est un responsable actif et retourne sa ferme (ENF-02, EF-T04). */
+    private static int fermeDuResponsable(Utilisateur acteur) {
+        if (acteur == null || acteur.getRole() != RoleUtilisateur.RESPONSABLE || !acteur.isActif()) {
+            throw new SecurityException("Action réservée au responsable de ferme.");
+        }
+        if (acteur.getIdFerme() == null) {
+            throw new SecurityException("Ce responsable n'est rattaché à aucune ferme.");
+        }
+        return acteur.getIdFerme();
+    }
+
+    /** Refuse l'accès à un élément d'une autre ferme (EF-T04). */
+    private static void exigerMemeFerme(int idFermeElement, int idFermeActeur) {
+        if (idFermeElement != idFermeActeur) {
+            throw new SecurityException("Cet élément appartient à une autre ferme.");
         }
     }
 }

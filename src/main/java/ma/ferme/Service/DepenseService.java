@@ -11,6 +11,7 @@ import ma.ferme.dao.DepenseDao;
 import ma.ferme.model.Depense;
 import ma.ferme.model.Utilisateur;
 import ma.ferme.model.enums.CategorieDepense;
+import ma.ferme.model.enums.RoleUtilisateur;
 
 /**
  * Règles métier des dépenses (EFR09, EFR10), réservées au responsable de la ferme (EF-T04).
@@ -54,7 +55,7 @@ public class DepenseService {
      */
     public Depense ajouter(Utilisateur acteur, LocalDate date, CategorieDepense categorie,
                            BigDecimal montant, String description) {
-        int idFerme = Droits.fermeDuResponsable(acteur);
+        int idFerme = fermeDuResponsable(acteur);
         Depense depense = new Depense(idFerme, date, categorie, montant, description);
         dao.insert(depense);
         return depense;
@@ -74,7 +75,7 @@ public class DepenseService {
      */
     public void modifier(Utilisateur acteur, int idDepense, LocalDate date, CategorieDepense categorie,
                          BigDecimal montant, String description) {
-        int idFerme = Droits.fermeDuResponsable(acteur);
+        int idFerme = fermeDuResponsable(acteur);
         Depense depense = trouver(idDepense, idFerme);
         depense.setDateDepense(date);
         depense.setCategorie(categorie);
@@ -92,7 +93,7 @@ public class DepenseService {
      * @throws IllegalArgumentException si la dépense est introuvable
      */
     public void supprimer(Utilisateur acteur, int idDepense) {
-        int idFerme = Droits.fermeDuResponsable(acteur);
+        int idFerme = fermeDuResponsable(acteur);
         trouver(idDepense, idFerme);
         dao.delete(idDepense);
     }
@@ -104,7 +105,7 @@ public class DepenseService {
      * @return les dépenses de sa ferme
      */
     public List<Depense> lister(Utilisateur acteur) {
-        return dao.findByFerme(Droits.fermeDuResponsable(acteur));
+        return dao.findByFerme(fermeDuResponsable(acteur));
     }
 
     /**
@@ -141,13 +142,31 @@ public class DepenseService {
      * @return le total en MAD
      */
     public BigDecimal totalDuMois(Utilisateur acteur, YearMonth mois) {
-        return dao.total(Droits.fermeDuResponsable(acteur), mois.atDay(1), mois.atEndOfMonth());
+        return dao.total(fermeDuResponsable(acteur), mois.atDay(1), mois.atEndOfMonth());
     }
 
     private Depense trouver(int idDepense, int idFerme) {
         Depense depense = dao.findById(idDepense)
                 .orElseThrow(() -> new IllegalArgumentException("Cette dépense n'existe plus."));
-        Droits.exigerMemeFerme(depense.getIdFerme(), idFerme);
+        exigerMemeFerme(depense.getIdFerme(), idFerme);
         return depense;
+    }
+
+    /** Vérifie que l'acteur est un responsable actif et retourne sa ferme (ENF-02, EF-T04). */
+    private static int fermeDuResponsable(Utilisateur acteur) {
+        if (acteur == null || acteur.getRole() != RoleUtilisateur.RESPONSABLE || !acteur.isActif()) {
+            throw new SecurityException("Action réservée au responsable de ferme.");
+        }
+        if (acteur.getIdFerme() == null) {
+            throw new SecurityException("Ce responsable n'est rattaché à aucune ferme.");
+        }
+        return acteur.getIdFerme();
+    }
+
+    /** Refuse l'accès à un élément d'une autre ferme (EF-T04). */
+    private static void exigerMemeFerme(int idFermeElement, int idFermeActeur) {
+        if (idFermeElement != idFermeActeur) {
+            throw new SecurityException("Cet élément appartient à une autre ferme.");
+        }
     }
 }
