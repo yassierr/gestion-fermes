@@ -1,5 +1,6 @@
 package ma.ferme.service;
 
+import ma.ferme.TestSupport;
 import ma.ferme.dao.OuvrierDao;
 import ma.ferme.dao.PointageDao;
 import ma.ferme.model.Ouvrier;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class PointageServiceTest {
 
@@ -21,26 +23,39 @@ class PointageServiceTest {
     private OuvrierService ouvrierService;
     private PointageDao pointageDao;
     private OuvrierDao ouvrierDao;
+    private int idFermeTest;
     private int idOuvrierTest;
 
     @BeforeEach
     void setUp() {
+        assumeTrue(TestSupport.baseDisponible(), "Base non disponible : test ignoré");
         pointageDao = new PointageDao();
         ouvrierDao = new OuvrierDao();
         pointageService = new PointageService(pointageDao, ouvrierDao);
         ouvrierService = new OuvrierService(ouvrierDao, pointageDao);
 
-        Ouvrier ouvrier = new Ouvrier(1, "Ouvrier Service Pointage", "PTG999", "0699999999", "Biougra", "Serre A", new BigDecimal("150.00"));
+        idFermeTest = TestSupport.premierId(
+                "INSERT INTO ferme (nom, localisation) VALUES ('Ferme PointageServiceTest " + System.nanoTime() + "', 'Biougra') RETURNING id"
+        );
+
+        String cin = "P" + (System.nanoTime() % 1_000_000_000L);
+        Ouvrier ouvrier = new Ouvrier(idFermeTest, "Ouvrier Service Pointage", cin, "0699999999", "Biougra", "Serre A", new BigDecimal("150.00"));
         ouvrierService.ajouterOuvrier(ouvrier);
         idOuvrierTest = ouvrier.getId();
     }
 
     @AfterEach
     void tearDown() {
+        if (!TestSupport.baseDisponible()) return;
         for (Pointage p : pointageDao.findByOuvrier(idOuvrierTest)) {
             pointageDao.delete(p.getId());
         }
-        ouvrierDao.delete(idOuvrierTest);
+        if (idOuvrierTest > 0) {
+            ouvrierDao.delete(idOuvrierTest);
+        }
+        if (idFermeTest > 0) {
+            TestSupport.executer("DELETE FROM ferme WHERE id = " + idFermeTest);
+        }
     }
 
     @Test
@@ -51,7 +66,6 @@ class PointageServiceTest {
         Pointage p1 = pointageService.pointerOuvrier(idOuvrierTest, aujourdhui, StatutPointage.ABSENT);
         assertEquals(StatutPointage.ABSENT, p1.getStatut());
 
-        // Deuxième pointage le même jour : doit mettre à jour sans créer de doublon
         Pointage p2 = pointageService.pointerOuvrier(idOuvrierTest, aujourdhui, StatutPointage.PRESENT);
         assertEquals(p1.getId(), p2.getId());
         assertEquals(StatutPointage.PRESENT, p2.getStatut());
@@ -93,7 +107,6 @@ class PointageServiceTest {
         BigDecimal montant = pointageService.calculerMontantPeriode(idOuvrierTest, jMinus2, aujourdhui);
 
         assertEquals(2.0, jours);
-        // 2.0 jours * 150.00 = 300.00
         assertEquals(0, new BigDecimal("300.00").compareTo(montant));
     }
 }
