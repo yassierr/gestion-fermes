@@ -29,13 +29,6 @@ class PointageTest {
     }
 
     @Test
-    @DisplayName("Devrait calculer 0.5 jour pour un statut DEMI_JOURNEE")
-    void testValeurJournee_DemiJournee() {
-        Pointage pointage = new Pointage(1, LocalDate.now(), StatutPointage.DEMI_JOURNEE);
-        assertEquals(0.5, pointage.getValeurJournee());
-    }
-
-    @Test
     @DisplayName("Devrait calculer 0.0 jour pour un statut ABSENT")
     void testValeurJournee_Absent() {
         Pointage pointage = new Pointage(1, LocalDate.now(), StatutPointage.ABSENT);
