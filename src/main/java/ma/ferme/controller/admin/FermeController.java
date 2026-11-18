@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import ma.ferme.dao.FermeDao;
 import ma.ferme.model.Ferme;
 import ma.ferme.service.FermeService;
+import ma.ferme.util.SceneNavigator;
 
 import java.util.Optional;
 
@@ -161,28 +162,16 @@ public class FermeController {
     }
 
     private void openFermeFormModal(Ferme fermeToEdit) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/admin/ferme-form.fxml"));
-            Parent root = loader.load();
-
-            FermeFormController controller = loader.getController();
-            controller.setFermeService(fermeService);
-            controller.setFerme(fermeToEdit);
-
-            Stage modalStage = new Stage();
-            modalStage.setTitle(fermeToEdit == null ? "Ajouter une ferme" : "Modifier la ferme");
-            modalStage.initModality(Modality.APPLICATION_MODAL);
-            modalStage.initOwner(tableFermes.getScene().getWindow());
-            modalStage.setScene(new Scene(root));
-            modalStage.showAndWait();
-
-            if (controller.isSaved()) {
-                loadFermesData();
+        SceneNavigator.openModal(
+            "/view/admin/ferme-form.fxml",
+            fermeToEdit == null ? "Ajouter une ferme" : "Modifier la ferme",
+            (FermeFormController controller) -> {
+                controller.setFermeService(fermeService);
+                controller.setFerme(fermeToEdit);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire : " + e.getMessage());
-        }
+        );
+        // After modal closes, refresh data if saved
+        loadFermesData();
     }
 
     private void handleSupprimer(Ferme ferme) {

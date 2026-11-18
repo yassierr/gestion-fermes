@@ -2,6 +2,7 @@ package ma.ferme.controller.admin;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -21,7 +22,7 @@ import java.util.Locale;
  * Gère le tableau de bord global et la navigation entre les modules.
  *
  * @author Brahim
- * @version 2.2
+ * @version 2.3
  */
 public class AdminMainController {
 
@@ -70,8 +71,15 @@ public class AdminMainController {
     private final FermeService fermeService = new FermeService(new FermeDao());
     private final NumberFormat madFormat = NumberFormat.getInstance(Locale.FRENCH);
 
+    // Cached reference to the dashboard view node
+    private Node dashboardView;
+
     @FXML
     public void initialize() {
+        // Capture the initial dashboard content from rootContentStack before any navigation replaces it
+        if (rootContentStack != null && !rootContentStack.getChildren().isEmpty()) {
+            dashboardView = rootContentStack.getChildren().get(0);
+        }
         showDashboard();
     }
 
@@ -82,6 +90,11 @@ public class AdminMainController {
     public void showDashboard() {
         setActiveNav(navDashboard);
         pageTitle.setText("Tableau de bord global");
+        
+        // Restore the cached dashboard view into rootContentStack
+        if (dashboardView != null && rootContentStack != null) {
+            rootContentStack.getChildren().setAll(dashboardView);
+        }
         loadGlobalStatistics();
     }
 
@@ -97,10 +110,12 @@ public class AdminMainController {
         setActiveNav(navFermes);
         pageTitle.setText("Gestion des fermes");
         try {
-            javafx.scene.Node fermesView = SceneNavigator.load(FERMES_VIEW);
-            rootContentStack.getChildren().setAll(fermesView);
+            Node fermesView = SceneNavigator.load(FERMES_VIEW);
+            if (rootContentStack != null) {
+                rootContentStack.getChildren().setAll(fermesView);
+            }
         } catch (Exception e) {
-            e.printStackTrace(); // This will print the exact FXML load error in your PowerShell terminal
+            e.printStackTrace();
             showPlaceholder("Impossible de charger la vue des fermes: " + e.getMessage());
         }
     }
@@ -167,7 +182,9 @@ public class AdminMainController {
         VBox box = new VBox(lbl);
         box.setAlignment(Pos.CENTER);
         box.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 40;");
-        rootContentStack.getChildren().setAll(box);
+        if (rootContentStack != null) {
+            rootContentStack.getChildren().setAll(box);
+        }
     }
 
     private void loadGlobalStatistics() {
@@ -268,7 +285,7 @@ public class AdminMainController {
         bar.setStyle("-fx-background-color: #1b5e20; -fx-background-radius: 4 4 0 0;");
 
         Label nameLbl = new Label(varietyName);
-        nameLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #6b7280;");
+        nameLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b;");
 
         col.getChildren().addAll(kgLbl, bar, nameLbl);
         varietyProductionContainer.getChildren().add(col);
