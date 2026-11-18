@@ -1,11 +1,18 @@
 package ma.ferme.controller.admin;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import ma.ferme.dao.FermeDao;
 import ma.ferme.model.Ferme;
 import ma.ferme.service.FermeService;
@@ -14,7 +21,7 @@ import java.util.Optional;
 
 /**
  * Contrôleur de gestion des fermes.
- * Gère l'affichage, la recherche, l'ajout, la modification et la suppression des fermes.
+ * Gère l'affichage, la recherche, l'ajout, la modification, la consultation et la suppression des fermes.
  *
  * @author Brahim
  * @version 1.0
@@ -48,16 +55,17 @@ public class FermeController {
     private void configureTable() {
         colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
         colLocalisation.setCellValueFactory(new PropertyValueFactory<>("localisation"));
-        
-        colResponsable.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty("Driss El Amrani"));
-        colAgentRh.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty("Youssef Alaoui"));
-        colStock.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getStockDisponible() + " kg"));
+
+        colResponsable.setCellValueFactory(cell -> new SimpleStringProperty("Driss El Amrani"));
+        colAgentRh.setCellValueFactory(cell -> new SimpleStringProperty("Youssef Alaoui"));
+        colStock.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStockDisponible() + " kg"));
 
         colActions.setCellFactory(param -> new TableCell<>() {
             private final MenuButton menuButton = new MenuButton("⋮");
+
             {
                 menuButton.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 14px;");
-                
+
                 MenuItem itemConsult = new MenuItem("👁 Consulter");
                 itemConsult.setOnAction(e -> {
                     Ferme ferme = getTableView().getItems().get(getIndex());
@@ -99,6 +107,7 @@ public class FermeController {
             if (lblTotalStock != null) lblTotalStock.setText("42 850 kg");
             if (lblTableSummary != null) lblTableSummary.setText("Affichage de " + totalFarms + " sur " + totalFarms + " fermes");
 
+            setupSearchFilter();
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible de charger la liste des fermes depuis la base de données.");
         }
@@ -113,9 +122,12 @@ public class FermeController {
                         return true;
                     }
                     String lowerCaseFilter = newValue.toLowerCase();
-                    return ferme.getNom().toLowerCase().contains(lowerCaseFilter) ||
-                           ferme.getLocalisation().toLowerCase().contains(lowerCaseFilter);
+                    return ferme.getNom().toLowerCase().contains(lowerCaseFilter)
+                            || ferme.getLocalisation().toLowerCase().contains(lowerCaseFilter);
                 });
+                if (lblTableSummary != null) {
+                    lblTableSummary.setText("Affichage de " + filteredData.size() + " sur " + fermeList.size() + " fermes");
+                }
             });
             tableFermes.setItems(filteredData);
         }
@@ -123,52 +135,54 @@ public class FermeController {
 
     @FXML
     private void handleAjouterFerme() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Ajouter une ferme");
-        dialog.setHeaderText("Création d'une nouvelle ferme");
-        dialog.setContentText("Nom de la ferme :");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(nom -> {
-            TextInputDialog locDialog = new TextInputDialog();
-            locDialog.setTitle("Localisation");
-            locDialog.setHeaderText("Localisation de la ferme");
-            locDialog.setContentText("Adresse / Ville :");
-            Optional<String> locResult = locDialog.showAndWait();
-            
-            locResult.ifPresent(localisation -> {
-                try {
-                    fermeService.creerFerme(nom, localisation);
-                    loadFermesData();
-                    showAlert(Alert.AlertType.INFORMATION, "Succès", "La ferme a été ajoutée avec succès.");
-                } catch (Exception e) {
-                    showAlert(Alert.AlertType.ERROR, "Erreur", e.getMessage());
-                }
-            });
-        });
+        openFermeFormModal(null);
     }
 
     private void handleConsulter(Ferme ferme) {
-        showAlert(Alert.AlertType.INFORMATION, "Détails de la ferme", "Nom : " + ferme.getNom() + "\nLocalisation : " + ferme.getLocalisation() + "\nStock disponible : " + ferme.getStockDisponible() + " kg");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/admin/ferme-detail.fxml"));
+            Parent detailView = loader.load();
+
+            FermeDetailController controller = loader.getController();
+            controller.initData(ferme);
+
+            StackPane contentStack = (StackPane) tableFermes.getScene().lookup("#rootContentStack");
+            if (contentStack != null) {
+                contentStack.getChildren().setAll(detailView);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir la fiche ferme : " + e.getMessage());
+        }
     }
 
     private void handleModifier(Ferme ferme) {
-        TextInputDialog dialog = new TextInputDialog(ferme.getNom());
-        dialog.setTitle("Modifier la ferme");
-        dialog.setHeaderText("Mise à jour des informations");
-        dialog.setContentText("Nouveau nom :");
+        openFermeFormModal(ferme);
+    }
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(nouveauNom -> {
-            ferme.setNom(nouveauNom);
-            try {
-                fermeService.modifierFerme(ferme);
+    private void openFermeFormModal(Ferme fermeToEdit) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/admin/ferme-form.fxml"));
+            Parent root = loader.load();
+
+            FermeFormController controller = loader.getController();
+            controller.setFermeService(fermeService);
+            controller.setFerme(fermeToEdit);
+
+            Stage modalStage = new Stage();
+            modalStage.setTitle(fermeToEdit == null ? "Ajouter une ferme" : "Modifier la ferme");
+            modalStage.initModality(Modality.APPLICATION_MODAL);
+            modalStage.initOwner(tableFermes.getScene().getWindow());
+            modalStage.setScene(new Scene(root));
+            modalStage.showAndWait();
+
+            if (controller.isSaved()) {
                 loadFermesData();
-                showAlert(Alert.AlertType.INFORMATION, "Succès", "Ferme modifiée avec succès.");
-            } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", e.getMessage());
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire : " + e.getMessage());
+        }
     }
 
     private void handleSupprimer(Ferme ferme) {
