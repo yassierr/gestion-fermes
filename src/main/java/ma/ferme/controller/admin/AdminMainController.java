@@ -97,9 +97,11 @@ public class AdminMainController {
         setActiveNav(navFermes);
         pageTitle.setText("Gestion des fermes");
         try {
-            rootContentStack.getChildren().setAll(SceneNavigator.load(FERMES_VIEW));
+            javafx.scene.Node fermesView = SceneNavigator.load(FERMES_VIEW);
+            rootContentStack.getChildren().setAll(fermesView);
         } catch (Exception e) {
-            showPlaceholder("Impossible de charger la vue des fermes.");
+            e.printStackTrace(); // This will print the exact FXML load error in your PowerShell terminal
+            showPlaceholder("Impossible de charger la vue des fermes: " + e.getMessage());
         }
     }
 
