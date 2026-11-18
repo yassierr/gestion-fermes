@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   
+   <!-- SIDEBAR -->
+   <left>
+      <VBox styleClass="sidebar" BorderPane.alignment="CENTER">
+         <VBox styleClass="sidebar-top">
+            <VBox styleClass="brand">
+               <Label text="Gestion des Fermes" styleClass="brand-title" />
+               <Label text="TOMATES CERISES • SOUSS-MASSA" styleClass="brand-subtitle" />
+            </VBox>
+            
+            <VBox styleClass="nav-menu">
+               <Button text="Tableau de bord" styleClass="nav-item" maxWidth="Infinity" alignment="TOP_LEFT"/>
+               <Button text="Serres" styleClass="nav-item" maxWidth="Infinity" alignment="TOP_LEFT"/>
+               <Button text="Récoltes" styleClass="nav-item, active" maxWidth="Infinity" alignment="TOP_LEFT"/>
+               <Button text="Dépenses" styleClass="nav-item" maxWidth="Infinity" alignment="TOP_LEFT"/>
+               <Button text="Livraisons &amp; Ouvriers" styleClass="nav-item" maxWidth="Infinity" alignment="TOP_LEFT"/>
+            </VBox>
+         </VBox>
+         
+         <VBox styleClass="sidebar-bottom">
+            <VBox styleClass="user-info">
+               <Label text="Saïd El Fassi" styleClass="user-name" />
+               <Label text="Directeur d'Exploitation" styleClass="user-role" />
+            </VBox>
+            <Button text="Se déconnecter" styleClass="logout-btn" maxWidth="Infinity" />
+         </VBox>
+      </VBox>
+   </left>
+
+   <!-- MAIN CONTENT AREA -->
+   <center>
+      <VBox styleClass="main-wrapper" BorderPane.alignment="CENTER">
+         <!-- Top Date Bar -->
+         <HBox styleClass="topbar">
+            <Label text="📅 Jeudi 24 Octobre 2024" styleClass="topbar-date" />
+         </HBox>
+
+         <!-- Scrollable / Padded Content -->
+         <VBox styleClass="content">
+            <!-- Page Header -->
+            <VBox styleClass="page-header">
+               <Label text="Récoltes" styleClass="page-title" />
+               <Label text="Enregistrement des pesées journalières, suivi du stock disponible et traçabilité" styleClass="page-subtitle" />
+            </VBox>
+
+            <!-- Stock Disponible Card -->
+            <VBox styleClass="stock-card">
+               <HBox styleClass="stock-card-top">
+                  <Label text="Stock disponible" styleClass="stock-card-label" />
+                  <HBox styleClass="stock-icon-box">
+                     <Label text="📦" />
+                  </HBox>
+               </HBox>
+               <HBox styleClass="stock-value-container">
+                  <Label text="18 450" styleClass="stock-value-number" />
+                  <Label text="kg" styleClass="stock-value-unit" />
+               </HBox>
+            </VBox>
+
+            <!-- Nouvelle Récolte Form Card -->
+            <VBox styleClass="form-card">
+               <HBox styleClass="form-card-header">
+                  <HBox styleClass="plus-box">
+                     <Label text="+" styleClass="plus-icon" />
+                  </HBox>
+                  <VBox styleClass="form-card-title-box">
+                     <Label text="Nouvelle récolte" styleClass="form-card-title" />
+                     <Label text="Enregistrement instantané d'une pesée en sortie de serre" styleClass="form-card-subtitle" />
+                  </VBox>
+               </HBox>
+
+               <HBox styleClass="harvest-form" spacing="15">
+                  <VBox styleClass="form-group" HBox.hgrow="ALWAYS">
+                     <Label text="Poids net (kg)" styleClass="field-label" />
+                     <HBox styleClass="input-wrapper">
+                        <TextField promptText="Ex: 850" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                        <Label text="kg" styleClass="input-suffix" />
+                     </HBox>
+                  </VBox>
+
+                  <VBox styleClass="form-group" HBox.hgrow="ALWAYS">
+                     <Label text="Variété" styleClass="field-label" />
+                     <ComboBox prefWidth="Infinity" promptText="Sweet Million" styleClass="combo-box" />
+                  </VBox>
+
+                  <VBox styleClass="form-group" alignment="BOTTOM_LEFT">
+                     <Button text="✓ Enregistrer" styleClass="submit-btn" maxWidth="Infinity" />
+                  </VBox>
+               </HBox>
+            </VBox>
+
+            <!-- Data Table Card -->
+            <VBox styleClass="table-card">
+               <TableView fx:id="tableView" prefHeight="300.0" styleClass="table-view">
+                 <columns>
+                   <TableColumn prefWidth="250.0" text="DATE &amp; HEURE" />
+                   <TableColumn prefWidth="200.0" styleClass="col-right" text="POIDS (KG)" />
+                   <TableColumn prefWidth="300.0" text="VARIÉTÉ" />
+                   <TableColumn prefWidth="180.0" styleClass="col-right" text="ACTIONS" />
+                 </columns>
+               </TableView>
+
+               <!-- Pagination Footer -->
+               <HBox styleClass="table-footer">
+                  <Label text="Affichage de 1 à 6 sur 48 pesées" styleClass="pagination-info" />
+                  <HBox styleClass="pagination-controls">
+                     <Button text="&lt;" styleClass="page-btn, disabled" />
+                     <Button text="1" styleClass="page-btn, active" />
+                     <Button text="2" styleClass="page-btn" />
+                     <Button text="3" styleClass="page-btn" />
+                     <Label text="..." styleClass="page-dots" />
+                     <Button text="8" styleClass="page-btn" />
+                     <Button text="&gt;" styleClass="page-btn" />
+                  </HBox>
+               </HBox>
+            </VBox>
+
+         </VBox>
+      </VBox>
+   </center>
+</BorderPane>
