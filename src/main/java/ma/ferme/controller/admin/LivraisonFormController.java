@@ -24,8 +24,7 @@ import ma.ferme.service.FermeService;
 import ma.ferme.service.VenteService;
 import ma.ferme.util.Formats;
 import ma.ferme.model.Ferme;
-import ma.ferme.service.FermeService;
-import ma.ferme.dao.FermeDao;
+
 import java.util.stream.Collectors;
 
 /**
