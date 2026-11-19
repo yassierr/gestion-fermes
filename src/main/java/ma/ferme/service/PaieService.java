@@ -1,4 +1,3 @@
-
 package ma.ferme.service;
 
 import ma.ferme.config.DatabaseConnection;
@@ -145,10 +144,7 @@ public class PaieService {
                 LocalDate datePaiement = LocalDate.now();
 
                 // Génération du numéro
-                String numero = recuPaieDao.prochainNumero(
-                        conn,
-                        datePaiement.getYear()
-                );
+                String numero = recuPaieDao.prochainNumero(conn);
 
                 // Création du reçu
                 int idRecu = recuPaieDao.insererRecu(
@@ -170,13 +166,7 @@ public class PaieService {
                 );
 
                 // Marquer les pointages comme payés
-                recuPaieDao.marquerPointagesPayes(
-                        conn,
-                        idRecu,
-                        idFerme,
-                        debut,
-                        fin
-                );
+                recuPaieDao.marquerPointagesPayes(conn, idRecu, lignesPaiement, debut, fin);
 
                 // Validation transactionnelle
                 conn.commit();

@@ -135,10 +135,7 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
                         recu.getIdAgentRh()
                 );
 
-                String numero = prochainNumero(
-                        conn,
-                        idFerme
-                );
+                String numero = prochainNumero(conn);
 
                 int idRecu = insererRecu(
                         conn,
@@ -516,27 +513,23 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
     // =========================================================
 
     /**
-     * Génère un numéro de reçu unique.
+     * Génère un numéro de reçu unique (séquence globale par année).
      *
-     * Format :
-     * RP-2026-000001
+     * Format : RP-2026-000001
      *
-     * Le verrou permet d'éviter les doublons en cas de paiements
-     * simultanés sur la même ferme.
+     * La contrainte d'unicité de recu_paie.numero est globale :
+     * le numéro ne doit donc PAS dépendre de la ferme.
+     * L'appelant doit avoir verrouillé recu_paie (SHARE ROW EXCLUSIVE)
+     * pour éviter les doublons en cas de paiements simultanés.
      */
-    public String prochainNumero(
-            Connection conn,
-            int idFerme
-    ) throws SQLException {
+    public String prochainNumero(Connection conn) throws SQLException {
 
         String sql = """
                 SELECT numero
                 FROM recu_paie
-                WHERE id_ferme = ?
-                  AND numero LIKE ?
-                ORDER BY id DESC
+                WHERE numero LIKE ?
+                ORDER BY numero DESC
                 LIMIT 1
-                FOR UPDATE
                 """;
 
         int annee = LocalDate.now().getYear();
@@ -547,15 +540,7 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(
-                    1,
-                    idFerme
-            );
-
-            stmt.setString(
-                    2,
-                    prefixe + "%"
-            );
+            stmt.setString(1, prefixe + "%");
 
             try (ResultSet rs = stmt.executeQuery()) {
 
@@ -563,18 +548,14 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
 
                     String numero = rs.getString("numero");
 
-                    String partieNumerique =
-                            numero.substring(prefixe.length());
-
                     prochain = Integer.parseInt(
-                            partieNumerique
+                            numero.substring(prefixe.length())
                     ) + 1;
                 }
             }
         }
 
-        return prefixe
-                + String.format("%06d", prochain);
+        return prefixe + String.format("%06d", prochain);
     }
 
 
@@ -969,11 +950,16 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
 
                 if (rs.next()) {
 
-                    return rs.getBigDecimal("solde");
+                    BigDecimal solde = rs.getBigDecimal("solde");
+
+                    // COALESCE(..., 0) renvoie un 0 sans décimales :
+                    // on normalise toujours à 2 décimales.
+                    return (solde == null ? BigDecimal.ZERO : solde)
+                            .setScale(2, RoundingMode.HALF_UP);
                 }
             }
 
-            return BigDecimal.ZERO;
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 
         } catch (SQLException e) {
 
