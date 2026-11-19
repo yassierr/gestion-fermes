@@ -1,214 +1,407 @@
+
 package ma.ferme.service;
+
+import ma.ferme.config.DatabaseConnection;
+import ma.ferme.dao.DaoException;
+import ma.ferme.dao.RecuPaieDao;
+import ma.ferme.dao.RecuPaieDao.LignePaiement;
+import ma.ferme.model.RecuPaie;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import ma.ferme.config.DatabaseConnection;
-import ma.ferme.dao.DaoException;
+import java.util.Optional;
 
 /**
- * Paiement des ouvriers d'une ferme. Le paiement est une operation
- * <b>atomique</b> : dans une seule transaction, il cree le recu de paie,
- * ses lignes (une par ouvrier) et marque les pointages PRESENT comme payes.
- * Si une etape echoue, rien n'est enregistre.
- * <p>
- * Regle : montant d'un ouvrier = nombre de jours PRESENT non payes x salaire journalier
- * (pas de demi-journee).
+ * Service métier de gestion des paiements des ouvriers.
  *
- * @author Yassir Hikou
- * @version 1.0
+ * Les règles métier sont centralisées ici.
+ * Les requêtes SQL sont déléguées à RecuPaieDao.
  */
 public class PaieService {
 
+    private final RecuPaieDao recuPaieDao;
+
+    public PaieService() {
+        this.recuPaieDao = new RecuPaieDao();
+    }
+
+    public PaieService(RecuPaieDao recuPaieDao) {
+        this.recuPaieDao = recuPaieDao;
+    }
+
+    // =========================================================
+    // RECORDS MÉTIER
+    // =========================================================
+
     /**
-     * Ligne d'un recu de paie.
-     *
-     * @param idOuvrier        identifiant de l'ouvrier
-     * @param matricule        matricule de l'ouvrier
-     * @param nomPrenom        nom et prenom
-     * @param jours            nombre de jours payes
-     * @param salaireJournalier salaire journalier en MAD
-     * @param montant          jours x salaire journalier
+     * Ligne d'un reçu de paie.
      */
-    public record LigneRecu(int idOuvrier, String matricule, String nomPrenom, int jours,
-                            BigDecimal salaireJournalier, BigDecimal montant) {
+    public record LigneRecu(
+            int idOuvrier,
+            String matricule,
+            String nomPrenom,
+            int jours,
+            BigDecimal salaireJournalier,
+            BigDecimal montant
+    ) {
     }
 
     /**
-     * Resultat d'un paiement : le recu cree et ses lignes.
-     *
-     * @param idRecu       identifiant du recu
-     * @param numero       numero du recu (RP-AAAA-NNNN)
-     * @param datePaiement date du paiement
-     * @param periodeDebut debut de la periode payee
-     * @param periodeFin   fin de la periode payee
-     * @param idFerme      identifiant de la ferme
-     * @param total        total paye en MAD
-     * @param lignes       detail par ouvrier
+     * Résultat complet d'un paiement.
      */
-    public record ResultatPaie(int idRecu, String numero, LocalDate datePaiement, LocalDate periodeDebut,
-                               LocalDate periodeFin, int idFerme, BigDecimal total, List<LigneRecu> lignes) {
+    public record ResultatPaie(
+            int idRecu,
+            String numero,
+            LocalDate datePaiement,
+            LocalDate periodeDebut,
+            LocalDate periodeFin,
+            int idFerme,
+            BigDecimal total,
+            List<LigneRecu> lignes
+    ) {
     }
 
     /**
-     * Paie tous les jours PRESENT non payes d'une ferme sur une periode.
-     *
-     * @param idFerme    identifiant de la ferme
-     * @param debut      premier jour de la periode (inclus)
-     * @param fin        dernier jour de la periode (inclus)
-     * @param idAgentRh  identifiant de l'agent RH qui effectue le paiement
-     * @return le recu cree avec son detail
-     * @throws IllegalArgumentException si la periode est invalide
-     * @throws IllegalStateException    s'il n'y a aucun jour a payer
-     * @throws DaoException             si une erreur SQL survient (la transaction est annulee)
+     * Résumé d'un reçu pour affichage.
      */
-    public ResultatPaie payerFerme(int idFerme, LocalDate debut, LocalDate fin, int idAgentRh) {
-        if (debut == null || fin == null) {
-            throw new IllegalArgumentException("La période est obligatoire");
-        }
-        if (fin.isBefore(debut)) {
-            throw new IllegalArgumentException("La date de fin doit être après la date de début");
-        }
-        try (Connection c = DatabaseConnection.getConnection()) {
-            c.setAutoCommit(false);
+    public record ResumeRecu(
+            int idRecu,
+            String numero,
+            LocalDate datePaiement,
+            LocalDate periodeDebut,
+            LocalDate periodeFin,
+            int nbOuvriers,
+            BigDecimal total
+    ) {
+    }
+
+    // =========================================================
+    // PAIEMENT D'UNE FERME
+    // =========================================================
+
+    /**
+     * Paie tous les jours PRESENT non payés d'une ferme
+     * sur la période demandée.
+     *
+     * Le paiement est atomique :
+     * - création du reçu ;
+     * - insertion des lignes ;
+     * - marquage des pointages ;
+     * - validation de la transaction.
+     *
+     * Si une opération échoue, la transaction est annulée.
+     */
+    public ResultatPaie payerFerme(
+            int idFerme,
+            LocalDate debut,
+            LocalDate fin,
+            int idAgentRh
+    ) {
+
+        // Validation métier
+        validerPeriode(debut, fin);
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            conn.setAutoCommit(false);
+
             try {
-                try (Statement st = c.createStatement()) {
-                    st.execute("LOCK TABLE recu_paie IN SHARE ROW EXCLUSIVE MODE");
+
+                // Empêcher les paiements concurrents
+                try (Statement stmt = conn.createStatement()) {
+
+                    stmt.execute(
+                            "LOCK TABLE recu_paie "
+                                    + "IN SHARE ROW EXCLUSIVE MODE"
+                    );
                 }
-                List<LigneRecu> lignes = calculerLignes(c, idFerme, debut, fin);
-                if (lignes.isEmpty()) {
-                    throw new IllegalStateException("Aucun jour à payer sur cette période");
+
+                // Récupérer les jours PRESENT non payés
+                List<LignePaiement> lignesPaiement =
+                        recuPaieDao.calculerLignesPaiement(
+                                conn,
+                                idFerme,
+                                debut,
+                                fin
+                        );
+
+                // Vérification métier
+                if (lignesPaiement.isEmpty()) {
+
+                    throw new IllegalStateException(
+                            "Aucun jour à payer sur cette période."
+                    );
                 }
-                BigDecimal total = lignes.stream().map(LigneRecu::montant).reduce(BigDecimal.ZERO, BigDecimal::add);
-                LocalDate aujourdhui = LocalDate.now();
-                String numero = prochainNumero(c, aujourdhui.getYear());
-                int idRecu = insererRecu(c, numero, aujourdhui, debut, fin, total, idFerme, idAgentRh);
-                insererLignes(c, idRecu, lignes);
-                marquerPointages(c, idRecu, idFerme, debut, fin);
-                c.commit();
-                return new ResultatPaie(idRecu, numero, aujourdhui, debut, fin, idFerme, total, lignes);
+
+                // Calcul du total
+                BigDecimal total = calculerTotal(lignesPaiement);
+
+                // Date du paiement
+                LocalDate datePaiement = LocalDate.now();
+
+                // Génération du numéro
+                String numero = recuPaieDao.prochainNumero(
+                        conn,
+                        datePaiement.getYear()
+                );
+
+                // Création du reçu
+                int idRecu = recuPaieDao.insererRecu(
+                        conn,
+                        numero,
+                        datePaiement,
+                        debut,
+                        fin,
+                        total,
+                        idFerme,
+                        idAgentRh
+                );
+
+                // Insertion des lignes de paiement
+                recuPaieDao.insererLignes(
+                        conn,
+                        idRecu,
+                        lignesPaiement
+                );
+
+                // Marquer les pointages comme payés
+                recuPaieDao.marquerPointagesPayes(
+                        conn,
+                        idRecu,
+                        idFerme,
+                        debut,
+                        fin
+                );
+
+                // Validation transactionnelle
+                conn.commit();
+
+                // Conversion vers le résultat métier
+                List<LigneRecu> lignes = convertirLignes(lignesPaiement);
+
+                return new ResultatPaie(
+                        idRecu,
+                        numero,
+                        datePaiement,
+                        debut,
+                        fin,
+                        idFerme,
+                        total,
+                        lignes
+                );
+
             } catch (SQLException | RuntimeException e) {
-                c.rollback();
+
+                conn.rollback();
                 throw e;
+
+            } finally {
+
+                conn.setAutoCommit(true);
             }
+
         } catch (SQLException e) {
-            throw new DaoException("Paiement impossible : " + e.getMessage(), e);
+
+            throw new DaoException(
+                    "Paiement impossible : " + e.getMessage(),
+                    e
+            );
         }
     }
 
+    // =========================================================
+    // VALIDATION MÉTIER
+    // =========================================================
+
+    private void validerPeriode(
+            LocalDate debut,
+            LocalDate fin
+    ) {
+
+        if (debut == null || fin == null) {
+
+            throw new IllegalArgumentException(
+                    "La période est obligatoire."
+            );
+        }
+
+        if (fin.isBefore(debut)) {
+
+            throw new IllegalArgumentException(
+                    "La date de fin doit être après la date de début."
+            );
+        }
+    }
+
+    // =========================================================
+    // CALCUL DU TOTAL
+    // =========================================================
+
+    private BigDecimal calculerTotal(List<LignePaiement> lignes) {
+
+        return lignes.stream()
+                .map(LignePaiement::montant)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // =========================================================
+    // CONVERSION DES LIGNES
+    // =========================================================
+
+    private List<LigneRecu> convertirLignes(
+            List<LignePaiement> lignes
+    ) {
+
+        List<LigneRecu> resultat = new ArrayList<>();
+
+        for (LignePaiement ligne : lignes) {
+
+            resultat.add(new LigneRecu(
+                    ligne.idOuvrier(),
+                    ligne.matricule(),
+                    ligne.nomPrenom(),
+                    ligne.jours(),
+                    ligne.salaireJournalier(),
+                    ligne.montant()
+            ));
+        }
+
+        return resultat;
+    }
+
+    // =========================================================
+    // SOLDE D'UN OUVRIER
+    // =========================================================
+
     /**
-     * Calcule le solde actuel d'un ouvrier : jours PRESENT non payes x salaire journalier.
-     *
-     * @param idOuvrier identifiant de l'ouvrier
-     * @return le solde en MAD (0 si aucun jour a payer)
+     * Calcule le solde des jours PRESENT non payés d'un ouvrier.
      */
     public BigDecimal soldeOuvrier(int idOuvrier) {
-        String sql = "SELECT COUNT(p.id) * o.salaire_journalier FROM ouvrier o "
-                + "LEFT JOIN pointage p ON p.id_ouvrier = o.id AND p.statut = 'PRESENT' AND p.id_recu IS NULL "
-                + "WHERE o.id = ? GROUP BY o.salaire_journalier";
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, idOuvrier);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getBigDecimal(1) : BigDecimal.ZERO;
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Calcul du solde impossible : " + e.getMessage(), e);
+
+        if (idOuvrier <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Identifiant ouvrier invalide."
+            );
         }
+
+        return recuPaieDao.calculerSoldeOuvrier(idOuvrier);
     }
 
-    private List<LigneRecu> calculerLignes(Connection c, int idFerme, LocalDate debut, LocalDate fin)
-            throws SQLException {
-        String sql = "SELECT o.id, o.matricule, o.nom_prenom, o.salaire_journalier, COUNT(p.id) AS jours "
-                + "FROM ouvrier o JOIN pointage p ON p.id_ouvrier = o.id "
-                + "AND p.statut = 'PRESENT' AND p.id_recu IS NULL AND p.date_pointage BETWEEN ? AND ? "
-                + "WHERE o.id_ferme = ? "
-                + "GROUP BY o.id, o.matricule, o.nom_prenom, o.salaire_journalier "
-                + "HAVING COUNT(p.id) > 0 ORDER BY o.matricule";
-        List<LigneRecu> out = new ArrayList<>();
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(debut));
-            ps.setDate(2, Date.valueOf(fin));
-            ps.setInt(3, idFerme);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    int jours = rs.getInt("jours");
-                    BigDecimal salaire = rs.getBigDecimal("salaire_journalier");
-                    out.add(new LigneRecu(rs.getInt("id"), rs.getString("matricule"),
-                            rs.getString("nom_prenom"), jours, salaire,
-                            salaire.multiply(BigDecimal.valueOf(jours))));
-                }
-            }
+    // =========================================================
+    // LISTE DES REÇUS D'UNE FERME
+    // =========================================================
+
+    /**
+     * Retourne les reçus d'une ferme pour affichage.
+     */
+    public List<ResumeRecu> listerRecus(int idFerme) {
+
+        if (idFerme <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Identifiant ferme invalide."
+            );
         }
-        return out;
+
+        return recuPaieDao.listerResumeRecus(idFerme)
+                .stream()
+                .map(r -> new ResumeRecu(
+                        r.idRecu(),
+                        r.numero(),
+                        r.datePaiement(),
+                        r.periodeDebut(),
+                        r.periodeFin(),
+                        r.nbOuvriers(),
+                        r.total()
+                ))
+                .toList();
     }
 
-    private String prochainNumero(Connection c, int annee) throws SQLException {
-        String prefix = "RP-" + annee + "-";
-        String sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(numero FROM 9) AS INTEGER)), 0) + 1 "
-                + "FROM recu_paie WHERE numero LIKE ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, prefix + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return prefix + String.format("%04d", rs.getInt(1));
-            }
+    // =========================================================
+    // EFFECTIF ACTIF
+    // =========================================================
+
+    /**
+     * Retourne le nombre d'ouvriers actifs d'une ferme.
+     */
+    public int effectifActif(int idFerme) {
+
+        if (idFerme <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Identifiant ferme invalide."
+            );
         }
+
+        return recuPaieDao.compterOuvriersActifs(idFerme);
     }
 
-    private int insererRecu(Connection c, String numero, LocalDate datePaiement, LocalDate debut, LocalDate fin,
-                            BigDecimal total, int idFerme, int idAgentRh) throws SQLException {
-        String sql = "INSERT INTO recu_paie(numero, date_paiement, periode_debut, periode_fin, total, id_ferme, id_agent_rh) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, numero);
-            ps.setDate(2, Date.valueOf(datePaiement));
-            ps.setDate(3, Date.valueOf(debut));
-            ps.setDate(4, Date.valueOf(fin));
-            ps.setBigDecimal(5, total);
-            ps.setInt(6, idFerme);
-            ps.setInt(7, idAgentRh);
-            try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getInt(1);
-            }
+    // =========================================================
+    // CHARGEMENT D'UN REÇU
+    // =========================================================
+
+    /**
+     * Charge un reçu de paie.
+     */
+    public Optional<RecuPaie> chargerRecu(int idRecu) {
+
+        if (idRecu <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Identifiant reçu invalide."
+            );
         }
+
+        return recuPaieDao.findById(idRecu);
     }
 
-    private void insererLignes(Connection c, int idRecu, List<LigneRecu> lignes) throws SQLException {
-        String sql = "INSERT INTO ligne_paie(jours_payes, salaire_journalier, montant, id_recu, id_ouvrier) "
-                + "VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            for (LigneRecu l : lignes) {
-                ps.setInt(1, l.jours());
-                ps.setBigDecimal(2, l.salaireJournalier());
-                ps.setBigDecimal(3, l.montant());
-                ps.setInt(4, idRecu);
-                ps.setInt(5, l.idOuvrier());
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        }
-    }
+    // =========================================================
+    // CHARGEMENT POUR PDF
+    // =========================================================
 
-    private void marquerPointages(Connection c, int idRecu, int idFerme, LocalDate debut, LocalDate fin)
-            throws SQLException {
-        String sql = "UPDATE pointage SET id_recu = ? WHERE statut = 'PRESENT' AND id_recu IS NULL "
-                + "AND date_pointage BETWEEN ? AND ? "
-                + "AND id_ouvrier IN (SELECT id FROM ouvrier WHERE id_ferme = ?)";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, idRecu);
-            ps.setDate(2, Date.valueOf(debut));
-            ps.setDate(3, Date.valueOf(fin));
-            ps.setInt(4, idFerme);
-            ps.executeUpdate();
+    /**
+     * Charge les données nécessaires à la génération PDF.
+     */
+    public Optional<ResultatPaie> chargerRecuPdf(int idRecu) {
+
+        if (idRecu <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Identifiant reçu invalide."
+            );
         }
+
+        return recuPaieDao.chargerDetailsPdf(idRecu)
+                .map(details -> {
+
+                    List<LigneRecu> lignes = details.lignes()
+                            .stream()
+                            .map(ligne -> new LigneRecu(
+                                    ligne.idOuvrier(),
+                                    ligne.matricule(),
+                                    ligne.nomPrenom(),
+                                    ligne.jours(),
+                                    ligne.salaireJournalier(),
+                                    ligne.montant()
+                            ))
+                            .toList();
+
+                    return new ResultatPaie(
+                            details.idRecu(),
+                            details.numero(),
+                            details.datePaiement(),
+                            details.periodeDebut(),
+                            details.periodeFin(),
+                            details.idFerme(),
+                            details.total(),
+                            lignes
+                    );
+                });
     }
 }
