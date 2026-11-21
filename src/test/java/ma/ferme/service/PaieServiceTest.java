@@ -3,15 +3,12 @@ package ma.ferme.service;
 
 import ma.ferme.dao.DaoException;
 import ma.ferme.dao.RecuPaieDao;
-import ma.ferme.config.DatabaseConnection;
-import ma.ferme.model.RecuPaie;
+
 import ma.ferme.TestSupport;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;

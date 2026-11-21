@@ -1,0 +1,206 @@
+/* Feuille de style propre à la modale livraison-form.fxml
+   Chemin : src/main/resources/css/livraison-form.css
+   Même charte que les autres modales de la maquette.
+   Classes préfixées "lf-". */
+
+.lf-root {
+    -fx-background-color: white;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.lf-header {
+    -fx-background-color: #F4F6FF;
+    -fx-padding: 18 22 14 22;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+}
+
+.lf-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.lf-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+.lf-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.lf-close:hover {
+    -fx-text-fill: #0F172A;
+}
+
+.lf-body {
+    -fx-padding: 18 22 8 22;
+}
+
+.lf-section-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.lf-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.lf-required {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #EF4444;
+}
+
+.lf-field,
+.lf-combo {
+    -fx-background-color: #EAF0FD;
+    -fx-background-radius: 8;
+    -fx-border-color: #D5DEF2;
+    -fx-border-radius: 8;
+    -fx-pref-height: 38;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0F172A;
+    -fx-prompt-text-fill: #94A3B8;
+}
+
+.lf-field {
+    -fx-padding: 0 12 0 12;
+}
+
+.lf-combo .list-cell {
+    -fx-text-fill: #0F172A;
+    -fx-padding: 0 0 0 4;
+}
+
+.lf-combo .text-field {
+    -fx-background-color: transparent;
+}
+
+.lf-field:focused,
+.lf-combo:focused {
+    -fx-border-color: #2E6B34;
+    -fx-effect: dropshadow(gaussian, rgba(46, 107, 52, 0.25), 6, 0.3, 0, 0);
+}
+
+/* Bloc d'ajout d'une ligne */
+.lf-line-box {
+    -fx-background-color: #F8FAFF;
+    -fx-background-radius: 10;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-padding: 14;
+}
+
+.lf-stock {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+}
+
+/* Tableau des lignes */
+.lf-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-table-cell-border-color: #F1F5F9;
+}
+
+.lf-table .column-header-background,
+.lf-table .column-header,
+.lf-table .filler {
+    -fx-background-color: #E8EEFB;
+}
+
+.lf-table .column-header .label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+.lf-table .table-cell {
+    -fx-text-fill: #0F172A;
+    -fx-font-size: 12px;
+}
+
+.lf-table .table-row-cell:selected {
+    -fx-background-color: #DCE8D8;
+}
+
+.lf-total {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+}
+
+.lf-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: #B91C1C;
+}
+
+.lf-footer {
+    -fx-background-color: #FAFBFF;
+    -fx-padding: 14 22 16 22;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+}
+
+/* Boutons */
+.lf-btn-cancel,
+.lf-btn-primary,
+.lf-btn-secondary,
+.lf-btn-danger {
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 9 18 9 18;
+    -fx-cursor: hand;
+}
+
+.lf-btn-cancel {
+    -fx-background-color: white;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-text-fill: #334155;
+}
+
+.lf-btn-cancel:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.lf-btn-primary {
+    -fx-background-color: #2E6B34;
+    -fx-text-fill: white;
+}
+
+.lf-btn-primary:hover {
+    -fx-background-color: #14532D;
+}
+
+.lf-btn-secondary {
+    -fx-background-color: white;
+    -fx-border-color: #2E6B34;
+    -fx-border-radius: 8;
+    -fx-text-fill: #2E6B34;
+}
+
+.lf-btn-secondary:hover {
+    -fx-background-color: #EEF5EB;
+}
+
+.lf-btn-danger {
+    -fx-background-color: white;
+    -fx-border-color: #FECACA;
+    -fx-border-radius: 8;
+    -fx-text-fill: #B91C1C;
+    -fx-padding: 6 14 6 14;
+}
+
+.lf-btn-danger:hover {
+    -fx-background-color: #FEF2F2;
+}
