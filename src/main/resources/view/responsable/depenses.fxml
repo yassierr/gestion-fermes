@@ -25,7 +25,7 @@
       styleClass="modal-root" spacing="20.0" prefWidth="520.0">
 
     <stylesheets>
-        <URL value="@../../css/depenses.css"/>
+        <URL value="C:\Users\AD\Desktop\gestion-fermes\src\main\resources\css\depenses.css"/>
     </stylesheets>
 
     <padding>

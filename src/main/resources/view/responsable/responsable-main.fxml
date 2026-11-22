@@ -24,7 +24,7 @@
             styleClass="main-root" prefWidth="1280.0" prefHeight="800.0">
 
     <stylesheets>
-        <URL value="@../../css/responsable.css"/>
+        <URL value="C:\Users\AD\Desktop\gestion-fermes\src\main\resources\css\responsable-main.css"/>
     </stylesheets>
 
     <!-- Barre latérale -->
