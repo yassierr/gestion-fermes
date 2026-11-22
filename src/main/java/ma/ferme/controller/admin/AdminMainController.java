@@ -27,7 +27,7 @@ import java.util.Locale;
 public class AdminMainController {
 
     private static final String FERMES_VIEW = "/view/admin/fermes.fxml";
-
+    private static final String CLIENTS_LIVRAISONS_VIEW = "/view/admin/clients-livraisons.fxml";
     @FXML private StackPane rootContentStack;
     @FXML private Label pageTitle;
 
@@ -117,10 +117,24 @@ public class AdminMainController {
 
     @FXML
     public void showClientsLivraisons() {
-        setActiveNav(navClientsLivraisons);
-        pageTitle.setText("Gestion des clients et des livraisons");
-        showPlaceholder("Espace de gestion des clients et de suivi des livraisons.");
+    setActiveNav(navClientsLivraisons);
+    pageTitle.setText("Gestion des clients et des livraisons");
+
+    try {
+        Node clientsLivraisonsView =
+                SceneNavigator.load(CLIENTS_LIVRAISONS_VIEW);
+
+        if (rootContentStack != null) {
+            rootContentStack.getChildren().setAll(clientsLivraisonsView);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        showPlaceholder(
+                "Impossible de charger la vue des clients et livraisons : "
+                        + e.getMessage()
+        );
     }
+}
 
     @FXML
     public void showClients() {

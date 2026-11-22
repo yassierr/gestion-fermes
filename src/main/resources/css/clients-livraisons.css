@@ -1,0 +1,150 @@
+/* Feuille de style propre à l'écran clients-livraisons.fxml
+   Chemin : src/main/resources/css/clients-livraisons.css
+   Toutes les classes sont préfixées "cl-" pour ne pas entrer en conflit
+   avec style.css ni avec les autres écrans.
+   Inspirée de la maquette page 32 : fond clair, cartes blanches, en-têtes de
+   tableau bleu pâle, champs de recherche bleutés, vert #2E6B34 / #14532D. */
+
+.cl-page-root {
+    -fx-background-color: #F6F8FD;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.cl-page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.cl-page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748B;
+}
+
+.cl-section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+/* Cartes d'indicateurs */
+.cl-kpi-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16 20 16 20;
+    }
+
+.cl-kpi-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+.cl-kpi-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+}
+
+/* Les créances sont mises en évidence en orange */
+.cl-kpi-value-warn {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #C2410C;
+}
+
+/* Carte contenant un tableau */
+.cl-table-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16;
+}
+
+.cl-table-card .table-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: #F1F5F9;
+}
+
+.cl-table-card .table-view .column-header-background,
+.cl-table-card .table-view .column-header,
+.cl-table-card .table-view .filler {
+    -fx-background-color: #E8EEFB;
+}
+
+.cl-table-card .table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 10px;
+}
+
+.cl-table-card .table-view .table-row-cell:selected {
+    -fx-background-color: #DCE8D8;
+}
+
+.cl-table-card .table-view .table-row-cell:selected .text,
+.cl-table-card .table-view .table-row-cell:selected .label {
+    -fx-fill: #0F172A;
+    -fx-text-fill: #0F172A;
+}
+
+/* Champ de recherche */
+.cl-search {
+    -fx-background-color: #EAF0FD;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #94A3B8;
+}
+
+.cl-search:focused {
+    -fx-border-color: #2E6B34;
+    -fx-effect: dropshadow(gaussian, rgba(46, 107, 52, 0.30), 6, 0.3, 0, 0);
+}
+
+/* Boutons */
+.cl-btn-primary,
+.cl-btn-secondary,
+.cl-btn-danger {
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.cl-btn-primary {
+    -fx-background-color: #2E6B34;
+    -fx-text-fill: white;
+}
+
+.cl-btn-primary:hover {
+    -fx-background-color: #14532D;
+}
+
+.cl-btn-secondary {
+    -fx-background-color: white;
+    -fx-border-color: #2E6B34;
+    -fx-border-radius: 8;
+    -fx-text-fill: #2E6B34;
+}
+
+.cl-btn-secondary:hover {
+    -fx-background-color: #EEF5EB;
+}
+
+.cl-btn-danger {
+    -fx-background-color: white;
+    -fx-border-color: #FECACA;
+    -fx-border-radius: 8;
+    -fx-text-fill: #B91C1C;
+}
+
+.cl-btn-danger:hover {
+    -fx-background-color: #FEF2F2;
+}

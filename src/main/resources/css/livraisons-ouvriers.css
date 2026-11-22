@@ -1,0 +1,172 @@
+/* Feuille de style propre à l'écran livraisons-ouvriers.fxml
+   Chemin : src/main/resources/css/livraisons-ouvriers.css
+   Inspirée des maquettes (pages 39-40) : fond clair bleuté, cartes blanches,
+   en-têtes de tableau bleu pâle, vert #2E6B34 / #14532D.
+   Classes préfixées "lo-" : aucun conflit avec les autres écrans. */
+
+.lo-page-root {
+    -fx-background-color: #F3F5FD;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.lo-eyebrow {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+}
+
+.lo-page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.lo-page-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+.lo-section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.lo-section-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+/* Cartes d'indicateurs : liseré vert en bas (livraisons) ou en haut (ouvriers) */
+.lo-kpi-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #E2E8F0 #E2E8F0 #2E6B34 #E2E8F0;
+    -fx-border-width: 1 1 3 1;
+    -fx-border-radius: 10;
+    -fx-padding: 14 18 14 18;
+}
+
+.lo-kpi-card-top {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #2E6B34 #E2E8F0 #E2E8F0 #E2E8F0;
+    -fx-border-width: 3 1 1 1;
+    -fx-border-radius: 10;
+    -fx-padding: 14 18 14 18;
+}
+
+.lo-kpi-title {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+.lo-kpi-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.lo-kpi-value-dark {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+/* Carte contenant un tableau */
+.lo-table-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-padding: 16;
+}
+
+.lo-table-card .table-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: #F1F5F9;
+}
+
+.lo-table-card .table-view .column-header-background {
+    -fx-background-color: #E8EEFB;
+}
+
+.lo-table-card .table-view .column-header,
+.lo-table-card .table-view .filler {
+    -fx-background-color: #E8EEFB;
+    -fx-size: 36;
+}
+
+.lo-table-card .table-view .column-header .label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+.lo-table-card .table-view .table-cell {
+    -fx-text-fill: #0F172A;
+    -fx-font-size: 12px;
+}
+
+.lo-table-card .table-view .table-row-cell:selected {
+    -fx-background-color: #DCE8D8;
+}
+
+.lo-table-card .table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: #0F172A;
+}
+
+/* Bascule Livraisons / Ouvriers : onglets en forme de pilule */
+.lo-page-tabs > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.lo-page-tabs > .tab-header-area {
+    -fx-padding: 0 0 0 0;
+}
+
+.lo-page-tabs .tab {
+    -fx-background-color: #E8EEFB;
+    -fx-background-radius: 16;
+    -fx-padding: 4 18 4 18;
+    -fx-cursor: hand;
+}
+
+.lo-page-tabs .tab:selected {
+    -fx-background-color: #2E6B34;
+}
+
+.lo-page-tabs .tab .tab-label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.lo-page-tabs .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.lo-page-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.lo-page-tabs > .tab-content-area {
+    -fx-background-color: transparent;
+}
+
+/* Bouton principal */
+.lo-btn-primary {
+    -fx-background-color: #2E6B34;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.lo-btn-primary:hover {
+    -fx-background-color: #14532D;
+}
