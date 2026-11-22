@@ -1,0 +1,121 @@
+/* Feuille de style propre à la modale client-form.fxml
+   Chemin : src/main/resources/css/client-form.css
+   Inspirée des modales de la maquette (ouvrier, dépense, compte) :
+   en-tête bleuté, champs bleu pâle, bouton principal vert.
+   Classes préfixées "cf-". */
+
+.cf-root {
+    -fx-background-color: white;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.cf-header {
+    -fx-background-color: #F4F6FF;
+    -fx-padding: 18 22 14 22;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+}
+
+.cf-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.cf-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+.cf-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.cf-close:hover {
+    -fx-text-fill: #0F172A;
+}
+
+.cf-body {
+    -fx-padding: 20 22 8 22;
+}
+
+.cf-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.cf-required {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #EF4444;
+}
+
+.cf-field,
+.cf-combo {
+    -fx-background-color: #EAF0FD;
+    -fx-background-radius: 8;
+    -fx-border-color: #D5DEF2;
+    -fx-border-radius: 8;
+    -fx-pref-height: 38;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0F172A;
+    -fx-prompt-text-fill: #94A3B8;
+}
+
+.cf-field {
+    -fx-padding: 0 12 0 12;
+}
+
+.cf-combo .list-cell {
+    -fx-text-fill: #0F172A;
+    -fx-padding: 0 0 0 4;
+}
+
+.cf-field:focused,
+.cf-combo:focused {
+    -fx-border-color: #2E6B34;
+    -fx-effect: dropshadow(gaussian, rgba(46, 107, 52, 0.25), 6, 0.3, 0, 0);
+}
+
+.cf-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: #B91C1C;
+}
+
+.cf-footer {
+    -fx-background-color: #FAFBFF;
+    -fx-padding: 14 22 16 22;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+}
+
+.cf-btn-cancel,
+.cf-btn-primary {
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 9 18 9 18;
+    -fx-cursor: hand;
+}
+
+.cf-btn-cancel {
+    -fx-background-color: white;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-text-fill: #334155;
+}
+
+.cf-btn-cancel:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.cf-btn-primary {
+    -fx-background-color: #2E6B34;
+    -fx-text-fill: white;
+}
+
+.cf-btn-primary:hover {
+    -fx-background-color: #14532D;
+}
