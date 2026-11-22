@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-border-color: #e5e7eb; -fx-border-radius: 10;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ma.ferme.controller.admin.FermeFormController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT">
+        <Label fx:id="lblFormTitle" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="Modifier la ferme" />
+        <Pane HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleClose" style="-fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-font-weight: bold; -fx-cursor: hand;" text="✕" />
+    </HBox>
+
+    <VBox spacing="10">
+        <!-- Nom de ferme -->
+        <VBox spacing="4">
+            <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #374151;" text="Nom de ferme *" />
+            <TextField fx:id="txtNom" promptText="Ex: Domaine Souss Prime" style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-padding: 8;" />
+        </VBox>
+
+        <!-- Localisation -->
+        <VBox spacing="4">
+            <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #374151;" text="Localisation *" />
+            <TextField fx:id="txtLocalisation" promptText="Ex: Biougra, Chtouka Ait Baha" style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-padding: 8;" />
+        </VBox>
+
+        <!-- Responsable & Agent RH (GridPane) -->
+        <GridPane hgap="10" vgap="4">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+            </columnConstraints>
+
+            <VBox spacing="4" GridPane.columnIndex="0">
+                <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #374151;" text="Responsable de ferme *" />
+                <ComboBox fx:id="comboResponsable" maxWidth="Infinity" promptText="Driss El Amrani" style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6;" />
+            </VBox>
+
+            <VBox spacing="4" GridPane.columnIndex="1">
+                <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #374151;" text="Agent RH *" />
+                <ComboBox fx:id="comboAgentRh" maxWidth="Infinity" promptText="Youssef Alaoui" style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6;" />
+            </VBox>
+         <rowConstraints>
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+
+        <!-- Stock disponible -->
+        <VBox spacing="4">
+            <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #374151;" text="Stock disponible *" />
+            <TextField fx:id="txtStock" promptText="12 500" style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-padding: 8;" />
+        </VBox>
+    </VBox>
+
+    <!-- Footer Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Button onAction="#handleAnnuler" style="-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 6; -fx-padding: 8 16;" text="Annuler" />
+        <Button onAction="#handleEnregistrer" style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 6; -fx-padding: 8 16;" text="💾 Enregistrer les modifications" />
+    </HBox>
+</VBox>
