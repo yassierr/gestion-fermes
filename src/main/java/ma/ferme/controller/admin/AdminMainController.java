@@ -32,11 +32,12 @@ public class AdminMainController {
     @FXML private Label pageTitle;
 
     // Sidebar Nav Buttons
-    @FXML private Button navDashboard;
+    @FXML private Button navDashboard; // legacy dashboard handler
     @FXML private Button navUsers;
     @FXML private Button navFermes;
-    @FXML private Button navClients;
-    @FXML private Button navLivraisons;
+    @FXML private Button navClientsLivraisons;
+    @FXML private Button navClients; // legacy handler
+    @FXML private Button navLivraisons; // legacy handler
     @FXML private Button navBilan;
 
     // Global KPI Labels
@@ -76,10 +77,6 @@ public class AdminMainController {
 
     @FXML
     public void initialize() {
-        // Capture the initial dashboard content from rootContentStack before any navigation replaces it
-        if (rootContentStack != null && !rootContentStack.getChildren().isEmpty()) {
-            dashboardView = rootContentStack.getChildren().get(0);
-        }
         showDashboard();
     }
 
@@ -89,13 +86,11 @@ public class AdminMainController {
     @FXML
     public void showDashboard() {
         setActiveNav(navDashboard);
-        pageTitle.setText("Tableau de bord global");
-        
-        // Restore the cached dashboard view into rootContentStack
-        if (dashboardView != null && rootContentStack != null) {
-            rootContentStack.getChildren().setAll(dashboardView);
+        pageTitle.setText("Tableau de bord");
+        // Dashboard content intentionally omitted: this section is navigation-only.
+        if (rootContentStack != null) {
+            rootContentStack.getChildren().clear();
         }
-        loadGlobalStatistics();
     }
 
     @FXML
@@ -118,6 +113,13 @@ public class AdminMainController {
             e.printStackTrace();
             showPlaceholder("Impossible de charger la vue des fermes: " + e.getMessage());
         }
+    }
+
+    @FXML
+    public void showClientsLivraisons() {
+        setActiveNav(navClientsLivraisons);
+        pageTitle.setText("Gestion des clients et des livraisons");
+        showPlaceholder("Espace de gestion des clients et de suivi des livraisons.");
     }
 
     @FXML
@@ -165,7 +167,7 @@ public class AdminMainController {
     }
 
     private void setActiveNav(Button activeBtn) {
-        Button[] navs = {navDashboard, navUsers, navFermes, navClients, navLivraisons, navBilan};
+        Button[] navs = {navDashboard, navUsers, navFermes, navClientsLivraisons, navBilan};
         for (Button btn : navs) {
             if (btn != null) {
                 btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4b5563; -fx-font-size: 13px; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 0 12;");
