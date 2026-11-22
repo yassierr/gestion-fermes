@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!--
+  Cadre de l'espace Responsable de ferme : barre latérale, barre de date et zone centrale
+  dans laquelle ResponsableMainController charge l'écran choisi (récoltes, dépenses, ...).
+  Ce n'est PAS le tableau de bord : celui-ci a son propre fichier (dashboard-responsable.fxml).
+  Contrôleur : ma.ferme.controller.responsable.ResponsableMainController
+  Styles     : css/responsable.css
+-->
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.ferme.controller.responsable.ResponsableMainController"
+            styleClass="main-root" prefWidth="1280.0" prefHeight="800.0">
+
+    <stylesheets>
+        <URL value="@../../css/responsable.css"/>
+    </stylesheets>
+
+    <!-- Barre latérale -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="245.0" minWidth="245.0" maxWidth="245.0">
+            <VBox styleClass="sidebar-top" spacing="0.0" VBox.vgrow="ALWAYS">
+                <VBox styleClass="brand" spacing="4.0">
+                    <Label text="Gestion des Fermes" styleClass="brand-title"/>
+                    <Label text="TOMATES CERISES • SOUSS-MASSA" styleClass="brand-subtitle" wrapText="true"/>
+                </VBox>
+
+                <VBox styleClass="nav-list" spacing="6.0">
+                    <Button fx:id="btnDashboard" text="Tableau de bord" styleClass="nav-btn"
+                            maxWidth="Infinity" onAction="#onDashboard"/>
+                    <Button fx:id="btnSerres" text="Serres" styleClass="nav-btn"
+                            maxWidth="Infinity" onAction="#onSerres"/>
+                    <Button fx:id="btnRecoltes" text="Récoltes" styleClass="nav-btn"
+                            maxWidth="Infinity" onAction="#onRecoltes"/>
+                    <Button fx:id="btnDepenses" text="Dépenses" styleClass="nav-btn"
+                            maxWidth="Infinity" onAction="#onDepenses"/>
+                    <Button fx:id="btnLivraisons" text="Livraisons &amp; Ouvriers" styleClass="nav-btn"
+                            maxWidth="Infinity" onAction="#onLivraisons"/>
+                </VBox>
+            </VBox>
+
+            <!-- Utilisateur connecté et déconnexion -->
+            <VBox styleClass="sidebar-bottom" spacing="14.0">
+                <VBox spacing="2.0">
+                    <Label fx:id="lblNom" text="Responsable" styleClass="user-name"/>
+                    <Label text="Responsable de ferme" styleClass="user-role"/>
+                </VBox>
+                <Button fx:id="btnDeconnexion" text="Se déconnecter" styleClass="logout-btn"
+                        maxWidth="Infinity" onAction="#onDeconnexion">
+                    <graphic>
+                        <SVGPath styleClass="icone-logout"
+                                 content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9"/>
+                    </graphic>
+                </Button>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Barre de date + écran courant -->
+    <center>
+        <VBox>
+            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="8.0" minHeight="52.0" prefHeight="52.0">
+                <SVGPath styleClass="icone-topbar"
+                         content="M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M16 2v4 M8 2v4 M3 10h18"/>
+                <Label fx:id="lblDate" text="" styleClass="topbar-date"/>
+            </HBox>
+            <StackPane fx:id="zoneContenu" styleClass="zone-contenu" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+</BorderPane>
