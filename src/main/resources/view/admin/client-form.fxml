@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Modal : Ajouter / Modifier un client.
+  Chemin : src/main/resources/view/admin/client-form.fxml
+  Contrôleur : ma.ferme.controller.admin.ClientFormController
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ma.ferme.controller.admin.ClientFormController"
+      stylesheets="@../../css/client-form.css"
+      styleClass="cf-root"
+      prefWidth="520">
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox styleClass="cf-header" alignment="CENTER_LEFT">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblTitre" text="Ajouter un client" styleClass="cf-title"/>
+            <Label text="Renseignez les informations du client (partagé par toute l'entreprise)."
+                   styleClass="cf-subtitle"/>
+        </VBox>
+        <Button text="✕" onAction="#onAnnuler" styleClass="cf-close"/>
+    </HBox>
+
+    <!-- ===== FORMULAIRE ===== -->
+    <VBox styleClass="cf-body" spacing="14">
+
+        <HBox spacing="16">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <HBox spacing="3">
+                    <Label text="CODE" styleClass="cf-label"/>
+                    <Label text="*" styleClass="cf-required"/>
+                </HBox>
+                <TextField fx:id="tfCode" promptText="Ex : CLI-001" styleClass="cf-field"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <HBox spacing="3">
+                    <Label text="TYPE" styleClass="cf-label"/>
+                    <Label text="*" styleClass="cf-required"/>
+                </HBox>
+                <ComboBox fx:id="cbType" promptText="Choisir un type"
+                          maxWidth="Infinity" styleClass="cf-combo"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="5">
+            <HBox spacing="3">
+                <Label text="NOM DU CLIENT" styleClass="cf-label"/>
+                <Label text="*" styleClass="cf-required"/>
+            </HBox>
+            <TextField fx:id="tfNom" promptText="Ex : Station Maraîchère du Souss"
+                       styleClass="cf-field"/>
+        </VBox>
+
+        <HBox spacing="16">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="TÉLÉPHONE" styleClass="cf-label"/>
+                <TextField fx:id="tfTelephone" promptText="+212 5XX XX XX XX"
+                           styleClass="cf-field"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="VILLE" styleClass="cf-label"/>
+                <TextField fx:id="tfVille" promptText="Ex : Agadir" styleClass="cf-field"/>
+            </VBox>
+        </HBox>
+
+        <Label fx:id="lblErreur" wrapText="true" minHeight="18" styleClass="cf-error"/>
+    </VBox>
+
+    <!-- ===== PIED ===== -->
+    <HBox styleClass="cf-footer" spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Annuler" onAction="#onAnnuler" styleClass="cf-btn-cancel"/>
+        <Button text="✓ Enregistrer le client" onAction="#onEnregistrer"
+                defaultButton="true" styleClass="cf-btn-primary"/>
+    </HBox>
+</VBox>
