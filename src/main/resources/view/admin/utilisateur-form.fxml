@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Modal « Créer un compte utilisateur » (aussi utilisé en mode « Modifier le compte »).
+  Contrôleur : ma.ferme.controller.admin.UtilisateurFormController
+  La maquette demande un « Email » ; le cahier des charges et la base utilisent un « login ».
+-->
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ma.ferme.controller.admin.UtilisateurFormController"
+      styleClass="usr-modal" prefWidth="560.0">
+
+    <stylesheets>
+        <URL value="@../../css/utilisateurs.css"/>
+    </stylesheets>
+
+    <!-- En-tête -->
+    <HBox styleClass="usr-modal-header" alignment="CENTER_LEFT">
+        <Label fx:id="lblTitre" text="Créer un compte utilisateur" styleClass="usr-modal-title"/>
+    </HBox>
+
+    <VBox styleClass="usr-modal-body" spacing="16.0">
+        <padding>
+            <Insets top="20.0" right="24.0" bottom="24.0" left="24.0"/>
+        </padding>
+
+        <!-- Nom complet + login -->
+        <HBox spacing="16.0">
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS" prefWidth="100.0">
+                <HBox spacing="3.0">
+                    <Label text="Nom complet" styleClass="usr-field-label"/>
+                    <Label text="*" styleClass="usr-required"/>
+                </HBox>
+                <TextField fx:id="txtNomComplet" styleClass="usr-field" promptText="Ex : Youssef Alaoui"/>
+            </VBox>
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS" prefWidth="100.0">
+                <HBox spacing="3.0">
+                    <Label text="Login" styleClass="usr-field-label"/>
+                    <Label text="*" styleClass="usr-required"/>
+                </HBox>
+                <TextField fx:id="txtLogin" styleClass="usr-field" promptText="Ex : youssef.alaoui"/>
+            </VBox>
+        </HBox>
+
+        <!-- Mot de passe (création seulement) -->
+        <VBox fx:id="boxMotDePasse" spacing="6.0">
+            <HBox spacing="3.0">
+                <Label text="Mot de passe" styleClass="usr-field-label"/>
+                <Label text="*" styleClass="usr-required"/>
+            </HBox>
+            <StackPane alignment="CENTER_RIGHT">
+                <PasswordField fx:id="pfMotDePasse" styleClass="usr-field, usr-field-password"
+                               promptText="6 caractères minimum"/>
+                <TextField fx:id="txtMotDePasseVisible" styleClass="usr-field, usr-field-password"
+                           promptText="6 caractères minimum" visible="false" managed="false"/>
+                <Button fx:id="btnAfficher" text="Afficher" styleClass="usr-eye"
+                        focusTraversable="false" onAction="#onBasculerMotDePasse">
+                    <StackPane.margin>
+                        <Insets right="6.0"/>
+                    </StackPane.margin>
+                </Button>
+            </StackPane>
+        </VBox>
+
+        <!-- Rôle + ferme -->
+        <HBox spacing="16.0">
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS" prefWidth="100.0">
+                <HBox spacing="3.0">
+                    <Label text="Rôle" styleClass="usr-field-label"/>
+                    <Label text="*" styleClass="usr-required"/>
+                </HBox>
+                <ComboBox fx:id="cbRole" styleClass="usr-combo" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS" prefWidth="100.0">
+                <HBox spacing="3.0">
+                    <Label text="Ferme à affecter" styleClass="usr-field-label"/>
+                    <Label text="*" styleClass="usr-required"/>
+                </HBox>
+                <ComboBox fx:id="cbFerme" styleClass="usr-combo" maxWidth="Infinity"
+                          promptText="Choisir une ferme"/>
+            </VBox>
+        </HBox>
+
+        <!-- Message d'erreur du service (caché tant qu'il n'y en a pas) -->
+        <Label fx:id="lblErreur" styleClass="usr-error" wrapText="true" maxWidth="Infinity"
+               visible="false" managed="false"/>
+
+        <!-- Boutons : Entrée valide, Échap annule -->
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Annuler" styleClass="usr-btn-cancel" cancelButton="true" onAction="#onAnnuler"/>
+            <Button fx:id="btnValider" text="Créer le compte" styleClass="usr-btn-submit"
+                    defaultButton="true" onAction="#onValider"/>
+        </HBox>
+    </VBox>
+</VBox>
