@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ma.ferme.controller.rh.OuvrierController"
+      spacing="12" prefWidth="420"
+      style="-fx-background-color: white;">
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <Label text="Nouvel ouvrier"
+           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+
+    <VBox spacing="4">
+        <Label text="Nom et prénom *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+        <TextField fx:id="tfFormNomPrenom" promptText="Ex: Youssef Benali"/>
+    </VBox>
+
+    <VBox spacing="4">
+        <Label text="CIN *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+        <TextField fx:id="tfFormCin" promptText="Ex: JA123456"/>
+    </VBox>
+
+    <VBox spacing="4">
+        <Label text="Téléphone (10 chiffres) *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+        <TextField fx:id="tfFormTelephone" promptText="Ex: 0612345678"/>
+    </VBox>
+
+    <VBox spacing="4">
+        <Label text="Adresse *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+        <TextField fx:id="tfFormAdresse" promptText="Ex: Douar Ait Melloul, Biougra"/>
+    </VBox>
+
+    <VBox spacing="4">
+        <Label text="Poste" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+        <TextField fx:id="tfFormPoste" promptText="Ex: Ouvrier agricole"/>
+    </VBox>
+
+    <VBox spacing="4">
+        <Label text="Salaire journalier (MAD) *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+        <TextField fx:id="tfFormSalaire" promptText="Ex: 150.00"/>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+        <Button text="Annuler" onAction="#onAnnulerModal"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 8 16;"/>
+        <Button text="Enregistrer" onAction="#onValiderCreationOuvrier"
+                style="-fx-background-color: #1b5e20; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 8 18;"/>
+    </HBox>
+</VBox>
