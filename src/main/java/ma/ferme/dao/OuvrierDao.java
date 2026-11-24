@@ -5,7 +5,9 @@ import ma.ferme.model.Ouvrier;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class OuvrierDao implements GenericDao<Ouvrier> {
@@ -111,6 +113,23 @@ public class OuvrierDao implements GenericDao<Ouvrier> {
 
         } catch (SQLException e) {
             throw new DaoException("Erreur lors de la récupération des ouvriers de la ferme: " + idFerme, e);
+        }
+    }
+
+    /** Compte les ouvriers actifs par ferme sans charger leurs données personnelles. */
+    public Map<Integer, Integer> compterActifsParFerme() {
+        String sql = "SELECT id_ferme, COUNT(*) AS effectif FROM ouvrier "
+                + "WHERE actif = TRUE GROUP BY id_ferme ORDER BY id_ferme";
+        Map<Integer, Integer> resultat = new LinkedHashMap<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                resultat.put(rs.getInt("id_ferme"), rs.getInt("effectif"));
+            }
+            return resultat;
+        } catch (SQLException e) {
+            throw new DaoException("Erreur lors du calcul de l'effectif actif par ferme.", e);
         }
     }
 

@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -216,6 +218,25 @@ public class UtilisateurDao implements GenericDao<Utilisateur> {
     public Optional<Utilisateur> findByFermeAndRole(int idFerme, RoleUtilisateur role) {
         return premier(SQL_SELECT + " WHERE id_ferme = ? AND role = ?::role_utilisateur ORDER BY id LIMIT 1",
                 List.of(idFerme, role.name()), "la recherche par ferme et rôle");
+    }
+
+    /**
+     * Retourne les noms des responsables par ferme sans charger les hashes de mot de passe.
+     */
+    public Map<Integer, String> nomsResponsablesParFerme() {
+        String sql = "SELECT id_ferme, nom_complet FROM utilisateur "
+                + "WHERE role = 'RESPONSABLE' ORDER BY id_ferme";
+        Map<Integer, String> resultat = new LinkedHashMap<>();
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultat.put(rs.getInt("id_ferme"), rs.getString("nom_complet"));
+            }
+            return resultat;
+        } catch (SQLException e) {
+            throw erreur("la lecture des responsables par ferme", e);
+        }
     }
 
     /**

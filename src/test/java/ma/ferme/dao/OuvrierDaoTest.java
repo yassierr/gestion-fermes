@@ -120,6 +120,22 @@ class OuvrierDaoTest {
     }
 
     @Test
+    @DisplayName("compterActifsParFerme : ignore les ouvriers désactivés")
+    void compterActifsParFerme() {
+        Ouvrier actif = new Ouvrier(idFermeTest, "Ouvrier Actif", uniqueCin(),
+                "0600000003", "Biougra", "Serre A", new BigDecimal("150.00"));
+        Ouvrier inactif = new Ouvrier(idFermeTest, "Ouvrier Inactif", uniqueCin(),
+                "0600000004", "Biougra", "Serre A", new BigDecimal("150.00"));
+        inactif.setActif(false);
+        ouvrierDao.insert(actif);
+        ouvrierDao.insert(inactif);
+        idsCrees.add(actif.getId());
+        idsCrees.add(inactif.getId());
+
+        assertEquals(1, ouvrierDao.compterActifsParFerme().get(idFermeTest));
+    }
+
+    @Test
     @DisplayName("Devrait mettre à jour un ouvrier")
     void testUpdate() {
         Ouvrier ouvrier = new Ouvrier(idFermeTest, "Chraib Anass", uniqueCin(), "0600000002", "Taroudant", "Cueillette", new BigDecimal("150.00"));

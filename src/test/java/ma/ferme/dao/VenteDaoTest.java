@@ -272,6 +272,14 @@ class VenteDaoTest {
     }
 
     @Test
+    void chiffreAffairesParFermeInclutLesLivraisonsNonAnnulees() {
+        vente = nouvelleVente(ferme.getId(), "10");
+        dao.insertAvecLignes(vente);
+
+        assertEquals(0, new BigDecimal("125.00").compareTo(dao.chiffreAffairesParFerme().get(ferme.getId())));
+    }
+
+    @Test
     void findByFermeRetrouveLaVente() {
         vente = nouvelleVente(ferme.getId(), "3");
 

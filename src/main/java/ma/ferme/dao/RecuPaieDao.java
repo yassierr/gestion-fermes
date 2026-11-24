@@ -16,7 +16,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -127,6 +129,12 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
         try (Connection conn = DatabaseConnection.getConnection()) {
 
             conn.setAutoCommit(false);
+
+            try (java.sql.Statement lockStmt = conn.createStatement()) {
+
+                        lockStmt.execute("LOCK TABLE recu_paie IN SHARE ROW EXCLUSIVE MODE");
+                
+                }
 
             try {
 
@@ -522,41 +530,31 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
      * L'appelant doit avoir verrouillé recu_paie (SHARE ROW EXCLUSIVE)
      * pour éviter les doublons en cas de paiements simultanés.
      */
-    public String prochainNumero(Connection conn) throws SQLException {
+        public String prochainNumero(Connection conn) throws SQLException {
 
-        String sql = """
-                SELECT numero
-                FROM recu_paie
-                WHERE numero LIKE ?
-                ORDER BY numero DESC
-                LIMIT 1
-                """;
+                String sql = """
+                        SELECT COALESCE(MAX(CAST(SUBSTRING(numero FROM ?) AS INTEGER)), 0)
+                        FROM recu_paie
+                        WHERE numero LIKE ?
+                        """;
 
-        int annee = LocalDate.now().getYear();
+                int annee = LocalDate.now().getYear();
+                String prefixe = "RP-" + annee + "-";
+                int prochain = 1;
 
-        String prefixe = "RP-" + annee + "-";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, prefixe.length() + 1);
+                stmt.setString(2, prefixe + "%");
 
-        int prochain = 1;
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, prefixe + "%");
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                if (rs.next()) {
-
-                    String numero = rs.getString("numero");
-
-                    prochain = Integer.parseInt(
-                            numero.substring(prefixe.length())
-                    ) + 1;
+                try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                        prochain = rs.getInt(1) + 1;
+                        }
                 }
-            }
-        }
+                }
 
-        return prefixe + String.format("%06d", prochain);
-    }
+                return prefixe + String.format("%06d", prochain);
+        }
 
 
     // =========================================================
@@ -712,6 +710,32 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
     // =========================================================
     // TOUS LES REÇUS
     // =========================================================
+
+    /**
+     * Total des reçus de paie par ferme, toutes périodes confondues.
+     *
+     * @return la masse salariale payée par identifiant de ferme
+     * @throws DaoException en cas d'erreur SQL
+     */
+    public Map<Integer, BigDecimal> totalPayeParFerme() {
+        String sql = """
+                SELECT id_ferme, SUM(total) AS total_paye
+                FROM recu_paie
+                GROUP BY id_ferme
+                ORDER BY id_ferme
+                """;
+        Map<Integer, BigDecimal> resultat = new LinkedHashMap<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                resultat.put(rs.getInt("id_ferme"), rs.getBigDecimal("total_paye"));
+            }
+            return resultat;
+        } catch (SQLException e) {
+            throw new DaoException("Erreur lors du calcul de la masse salariale par ferme.", e);
+        }
+    }
 
     @Override
     public List<RecuPaie> findAll() {
