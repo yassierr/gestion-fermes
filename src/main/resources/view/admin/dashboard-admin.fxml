@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Écran « Tableau de bord global » (maquette admin, page Tableau de bord).
+  Contenu seul : la sidebar et la barre du haut sont dans admin-main.fxml.
+  Contrôleur : ma.ferme.controller.admin.DashboardAdminController
+-->
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.ferme.controller.admin.DashboardAdminController"
+            fitToWidth="true" hbarPolicy="NEVER" styleClass="dash-scroll">
+
+    <stylesheets>
+        <URL value="@../../css/dashboard-admin.css"/>
+    </stylesheets>
+
+    <VBox styleClass="dash-page" spacing="24.0">
+        <padding>
+            <Insets top="28.0" right="32.0" bottom="28.0" left="32.0"/>
+        </padding>
+
+        <!-- En-tête -->
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Tableau de bord global" styleClass="dash-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Exporter le tableau de bord (PDF)" styleClass="dash-btn-export"
+                    onAction="#onExporterPdf"/>
+        </HBox>
+
+        <!-- Cartes : 3 puis 4 (comme la maquette PDF) -->
+        <VBox spacing="16.0">
+            <HBox spacing="16.0">
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="CHIFFRE D'AFFAIRES" styleClass="dash-card-label"/>
+                    <Label fx:id="lblChiffreAffaires" text="—" styleClass="dash-card-value"/>
+                </VBox>
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="BÉNÉFICE NET" styleClass="dash-card-label"/>
+                    <Label fx:id="lblBenefice" text="—" styleClass="dash-card-value"/>
+                </VBox>
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="MASSE SALARIALE" styleClass="dash-card-label"/>
+                    <Label fx:id="lblMasseSalariale" text="—" styleClass="dash-card-value"/>
+                </VBox>
+            </HBox>
+            <HBox spacing="16.0">
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="NOMBRE DE FERMES" styleClass="dash-card-label"/>
+                    <Label fx:id="lblNbFermes" text="—" styleClass="dash-card-value"/>
+                </VBox>
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="SURFACE TOTALE" styleClass="dash-card-label"/>
+                    <Label fx:id="lblSurface" text="—" styleClass="dash-card-value"/>
+                </VBox>
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="STOCK DISPONIBLE" styleClass="dash-card-label"/>
+                    <Label fx:id="lblStock" text="—" styleClass="dash-card-value"/>
+                </VBox>
+                <VBox styleClass="dash-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                    <Label text="EFFECTIF OUVRIERS" styleClass="dash-card-label"/>
+                    <Label fx:id="lblEffectif" text="—" styleClass="dash-card-value"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- Graphiques -->
+        <HBox spacing="20.0">
+            <!-- Chiffre d'affaires par ferme -->
+            <VBox styleClass="dash-chart-card" spacing="20.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                <HBox alignment="TOP_LEFT">
+                    <VBox spacing="2.0">
+                        <Label text="RÉPARTITION FINANCIÈRE" styleClass="dash-chart-subtitle"/>
+                        <Label text="Chiffre d'affaires par ferme" styleClass="dash-chart-title"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblTotalCa" text="Total : —" styleClass="dash-chip"/>
+                </HBox>
+                <VBox fx:id="boxCaParFerme" spacing="14.0"/>
+            </VBox>
+
+            <!-- Production par variété -->
+            <VBox styleClass="dash-chart-card" spacing="12.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                <HBox alignment="TOP_LEFT">
+                    <VBox spacing="2.0">
+                        <Label text="RÉPARTITION VARIÉTALE" styleClass="dash-chart-subtitle"/>
+                        <Label text="Production par variété (kg)" styleClass="dash-chart-title"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblTotalProduction" text="Total : —" styleClass="dash-chip"/>
+                </HBox>
+                <BarChart fx:id="chartProduction" styleClass="dash-chart" legendVisible="false"
+                          animated="false" categoryGap="24.0" barGap="0.0" prefHeight="240.0">
+                    <xAxis>
+                        <CategoryAxis side="BOTTOM"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis side="LEFT"/>
+                    </yAxis>
+                </BarChart>
+                <Label text="Variétés cerises certifiées" styleClass="dash-note"/>
+            </VBox>
+        </HBox>
+
+        <!-- Performances et rentabilité par ferme -->
+        <VBox styleClass="dash-card-table">
+            <HBox styleClass="dash-filter-bar" alignment="CENTER_LEFT" spacing="12.0">
+                <Label text="Performances et rentabilité par ferme" styleClass="dash-table-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="txtRecherche" styleClass="dash-search" prefWidth="300.0"
+                           promptText="Rechercher une ferme ou un responsable..."/>
+            </HBox>
+
+            <TableView fx:id="table" styleClass="dash-table" minHeight="160.0">
+                <columns>
+                    <TableColumn fx:id="colFerme" text="FERME" prefWidth="170.0" sortable="false"/>
+                    <TableColumn fx:id="colResponsable" text="RESPONSABLE" prefWidth="130.0" sortable="false"/>
+                    <TableColumn fx:id="colSurface" text="SURFACE" prefWidth="90.0" sortable="false"/>
+                    <TableColumn fx:id="colProduction" text="PRODUCTION" prefWidth="100.0" sortable="false"/>
+                    <TableColumn fx:id="colStock" text="STOCK DISPONIBLE (KG)" prefWidth="130.0" sortable="false"/>
+                    <TableColumn fx:id="colDepenses" text="DÉPENSES" prefWidth="110.0" sortable="false"/>
+                    <TableColumn fx:id="colBenefice" text="BÉNÉFICE (MAD)" prefWidth="120.0" sortable="false"/>
+                    <TableColumn fx:id="colEffectif" text="EFFECTIF" prefWidth="90.0" sortable="false"/>
+                    <TableColumn fx:id="colAction" text="ACTION" prefWidth="100.0" sortable="false"/>
+                </columns>
+            </TableView>
+
+            <HBox styleClass="dash-footer" alignment="CENTER_LEFT" spacing="8.0">
+                <Label fx:id="lblPagination" text="" styleClass="dash-pagination-info"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnPrecedent" text="‹ Précédent" styleClass="dash-page-btn"
+                        onAction="#onPagePrecedente"/>
+                <Label fx:id="lblPage" text="Page 1 / 1" styleClass="dash-page-label"/>
+                <Button fx:id="btnSuivant" text="Suivant ›" styleClass="dash-page-btn"
+                        onAction="#onPageSuivante"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>
