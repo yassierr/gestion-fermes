@@ -23,13 +23,13 @@ INSERT INTO ferme (id, nom, localisation) VALUES
 -- ---------- Utilisateurs ----------
 -- ADMIN sans ferme ; RESPONSABLE et AGENT_RH : un seul de chaque par ferme
 INSERT INTO utilisateur (id, nom_complet, login, mot_de_passe_hash, role, actif, id_ferme) VALUES
- (1, 'Administrateur Général', 'admin',   '$2a$12$.mEn176k2WtA91jK4TNL/OXz3N8cDJPokNvYfl7YJmqLDVSGb5mua', 'ADMIN',       TRUE, NULL),
- (2, 'Youssef Benali',         'resp1',   '$2a$10$Q4AyG.ECojLinvZpv6NdFuJRloi5jJeJLfL36CIVihGZNRfRXqfRC', 'RESPONSABLE', TRUE, 1),
- (3, 'Salma Idrissi',          'rh1',     '$2a$10$Q4AyG.ECojLinvZpv6NdFuJRloi5jJeJLfL36CIVihGZNRfRXqfRC', 'AGENT_RH',    TRUE, 1),
- (4, 'Karim El Amrani',        'resp2',   '$2a$10$Q4AyG.ECojLinvZpv6NdFuJRloi5jJeJLfL36CIVihGZNRfRXqfRC', 'RESPONSABLE', TRUE, 2),
- (5, 'Nadia Chraibi',          'rh2',     '$2a$10$Q4AyG.ECojLinvZpv6NdFuJRloi5jJeJLfL36CIVihGZNRfRXqfRC', 'AGENT_RH',    TRUE, 2),
- (6, 'Omar Tazi',              'resp3',   '$2a$10$Q4AyG.ECojLinvZpv6NdFuJRloi5jJeJLfL36CIVihGZNRfRXqfRC', 'RESPONSABLE', TRUE, 3),
- (7, 'Hind Alaoui',            'rh3',     '$2a$10$Q4AyG.ECojLinvZpv6NdFuJRloi5jJeJLfL36CIVihGZNRfRXqfRC', 'AGENT_RH',    FALSE, 3);
+ (1, 'Administrateur Général', 'admin',   '$2a$12$ntzTlGwWgoJvJRkePcM.jepQPZQy02Kuk3Zwpn1Yeef4Xv58jQrs6', 'ADMIN',       TRUE, NULL),
+ (2, 'Youssef Benali',         'resp1',   '$2a$12$Mn3dmZz6hkYd5ibPN33/S.OoE1qidkoancUJojxoLq.4E4v/rewuW', 'RESPONSABLE', TRUE, 1),
+ (3, 'Salma Idrissi',          'rh1',     '$2a$12$HQtwUiyBZMUw6nvUO3ezcOYtWTf3NgSmDLd6N.0iTAVr0jNQIpX6O', 'AGENT_RH',    TRUE, 1),
+ (4, 'Karim El Amrani',        'resp2',   '$2a$12$Mn3dmZz6hkYd5ibPN33/S.OoE1qidkoancUJojxoLq.4E4v/rewuW', 'RESPONSABLE', TRUE, 2),
+ (5, 'Nadia Chraibi',          'rh2',     '$2a$12$HQtwUiyBZMUw6nvUO3ezcOYtWTf3NgSmDLd6N.0iTAVr0jNQIpX6O', 'AGENT_RH',    TRUE, 2),
+ (6, 'Omar Tazi',              'resp3',   '$2a$12$Mn3dmZz6hkYd5ibPN33/S.OoE1qidkoancUJojxoLq.4E4v/rewuW', 'RESPONSABLE', TRUE, 3),
+ (7, 'Hind Alaoui',            'rh3',     '$2a$12$HQtwUiyBZMUw6nvUO3ezcOYtWTf3NgSmDLd6N.0iTAVr0jNQIpX6O', 'AGENT_RH',    FALSE, 3);
 
 -- ---------- Serres ----------
 INSERT INTO serre (id, nom, surface_m2, structure, irrigation, variete, id_ferme) VALUES
