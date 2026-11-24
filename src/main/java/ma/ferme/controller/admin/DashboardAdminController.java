@@ -1,6 +1,7 @@
 package ma.ferme.controller.admin;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -18,7 +19,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -32,6 +35,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -255,10 +259,33 @@ public class DashboardAdminController {
         }
     }
 
-    /** Clic sur « Consulter » : doit ouvrir la fiche détaillée de la ferme (écran de Brahim). */
+    /** Ouvre la fiche détaillée de la ferme sélectionnée. */
     private void onConsulter(LigneFerme ligne) {
-        AlertUtil.info("Fiche détaillée de « " + ligne.ferme()
-                + " » : à relier à /view/admin/ferme-detail.fxml.");
+        if (ligne == null || ligne.total()) {
+            return;
+        }
+
+        try {
+            Ferme ferme = fermeService.obtenirFermeParId(ligne.idFerme()).orElse(null);
+            if (ferme == null) {
+                AlertUtil.error("Cette ferme n'existe plus.");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/admin/ferme-detail.fxml"));
+            Parent detailView = loader.load();
+            loader.<FermeDetailController>getController().initData(ferme);
+
+            StackPane contentStack = (StackPane) table.getScene().lookup("#rootContentStack");
+            if (contentStack == null) {
+                AlertUtil.error("Impossible de trouver la zone d'affichage de la fiche ferme.");
+                return;
+            }
+            contentStack.getChildren().setAll(detailView);
+        } catch (IOException | DaoException e) {
+            LOG.log(Level.SEVERE, "Impossible d'ouvrir la fiche de la ferme " + ligne.idFerme(), e);
+            AlertUtil.error("Impossible d'ouvrir la fiche ferme : " + e.getMessage());
+        }
     }
 
     // ------------------------------------------------------------------

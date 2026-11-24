@@ -128,6 +128,12 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
 
             conn.setAutoCommit(false);
 
+            try (java.sql.Statement lockStmt = conn.createStatement()) {
+
+                        lockStmt.execute("LOCK TABLE recu_paie IN SHARE ROW EXCLUSIVE MODE");
+                
+                }
+
             try {
 
                 int idFerme = recupererIdFermeAgent(
@@ -522,41 +528,31 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
      * L'appelant doit avoir verrouillé recu_paie (SHARE ROW EXCLUSIVE)
      * pour éviter les doublons en cas de paiements simultanés.
      */
-    public String prochainNumero(Connection conn) throws SQLException {
+        public String prochainNumero(Connection conn) throws SQLException {
 
-        String sql = """
-                SELECT numero
-                FROM recu_paie
-                WHERE numero LIKE ?
-                ORDER BY numero DESC
-                LIMIT 1
-                """;
+                String sql = """
+                        SELECT COALESCE(MAX(CAST(SUBSTRING(numero FROM ?) AS INTEGER)), 0)
+                        FROM recu_paie
+                        WHERE numero LIKE ?
+                        """;
 
-        int annee = LocalDate.now().getYear();
+                int annee = LocalDate.now().getYear();
+                String prefixe = "RP-" + annee + "-";
+                int prochain = 1;
 
-        String prefixe = "RP-" + annee + "-";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, prefixe.length() + 1);
+                stmt.setString(2, prefixe + "%");
 
-        int prochain = 1;
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, prefixe + "%");
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                if (rs.next()) {
-
-                    String numero = rs.getString("numero");
-
-                    prochain = Integer.parseInt(
-                            numero.substring(prefixe.length())
-                    ) + 1;
+                try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                        prochain = rs.getInt(1) + 1;
+                        }
                 }
-            }
-        }
+                }
 
-        return prefixe + String.format("%06d", prochain);
-    }
+                return prefixe + String.format("%06d", prochain);
+        }
 
 
     // =========================================================
