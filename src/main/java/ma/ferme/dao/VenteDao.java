@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -241,6 +242,30 @@ public class VenteDao implements GenericDao<Vente> {
      */
     public BigDecimal chiffreAffaires() {
         return somme("v.statut <> 'ANNULEE'");
+    }
+
+    /**
+     * Chiffre d'affaires de toutes les fermes, hors livraisons annulees.
+     *
+     * @return le chiffre d'affaires par identifiant de ferme
+     * @throws DaoException en cas d'erreur SQL
+     */
+    public Map<Integer, BigDecimal> chiffreAffairesParFerme() {
+        String sql = "SELECT lv.id_ferme, SUM(lv.quantite_kg * lv.prix_kg) AS chiffre_affaires "
+                + "FROM ligne_vente lv JOIN vente v ON v.id = lv.id_vente "
+                + "WHERE v.statut <> 'ANNULEE' "
+                + "GROUP BY lv.id_ferme ORDER BY lv.id_ferme";
+        Map<Integer, BigDecimal> resultat = new LinkedHashMap<>();
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultat.put(rs.getInt("id_ferme"), rs.getBigDecimal("chiffre_affaires"));
+            }
+            return resultat;
+        } catch (SQLException e) {
+            throw new DaoException("Calcul du chiffre d'affaires par ferme impossible.", e);
+        }
     }
 
     /**

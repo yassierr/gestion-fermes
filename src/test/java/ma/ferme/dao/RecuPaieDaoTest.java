@@ -68,4 +68,15 @@ class RecuPaieDaoTest {
         dao.delete(recu.getId());
         assertTrue(dao.findById(recu.getId()).isEmpty());
     }
+
+    @Test
+    @DisplayName("totalPayeParFerme : agrège les reçus de la ferme")
+    void totalPayeParFerme() {
+        RecuPaie recu = new RecuPaie(idAgent, LocalDate.of(2026, 11, 15),
+                LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 15));
+        recu.ajouterLigne(new LignePaie(idOuvrier, 5.0, new BigDecimal("750.00")));
+        dao.insert(recu);
+
+        assertEquals(0, new BigDecimal("750.00").compareTo(dao.totalPayeParFerme().get(idFerme)));
+    }
 }

@@ -16,7 +16,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -708,6 +710,32 @@ public class RecuPaieDao implements GenericDao<RecuPaie> {
     // =========================================================
     // TOUS LES REÇUS
     // =========================================================
+
+    /**
+     * Total des reçus de paie par ferme, toutes périodes confondues.
+     *
+     * @return la masse salariale payée par identifiant de ferme
+     * @throws DaoException en cas d'erreur SQL
+     */
+    public Map<Integer, BigDecimal> totalPayeParFerme() {
+        String sql = """
+                SELECT id_ferme, SUM(total) AS total_paye
+                FROM recu_paie
+                GROUP BY id_ferme
+                ORDER BY id_ferme
+                """;
+        Map<Integer, BigDecimal> resultat = new LinkedHashMap<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                resultat.put(rs.getInt("id_ferme"), rs.getBigDecimal("total_paye"));
+            }
+            return resultat;
+        } catch (SQLException e) {
+            throw new DaoException("Erreur lors du calcul de la masse salariale par ferme.", e);
+        }
+    }
 
     @Override
     public List<RecuPaie> findAll() {

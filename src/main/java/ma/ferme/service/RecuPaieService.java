@@ -7,6 +7,7 @@ import ma.ferme.model.RecuPaie;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -59,6 +60,13 @@ public class RecuPaieService {
      */
     public List<RecuPaie> listerTous() {
         return recuPaieDao.findAll();
+    }
+
+    /**
+     * Total des reçus de paie par ferme, sans limite de période.
+     */
+    public Map<Integer, BigDecimal> totalPayeParFerme() {
+        return recuPaieDao.totalPayeParFerme();
     }
 
     /**
