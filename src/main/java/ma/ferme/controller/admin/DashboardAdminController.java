@@ -1,5 +1,6 @@
 package ma.ferme.controller.admin;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import ma.ferme.dao.DaoException;
@@ -40,6 +42,7 @@ import ma.ferme.model.Ferme;
 import ma.ferme.security.Session;
 import ma.ferme.service.FermeService;
 import ma.ferme.util.AlertUtil;
+import ma.ferme.util.PdfUtil;
 
 /**
  * Contrôleur du tableau de bord global ({@code /view/admin/dashboard-admin.fxml}), EF-A03 à EF-A06.
@@ -185,7 +188,55 @@ public class DashboardAdminController {
     /** Clic sur « Exporter le tableau de bord (PDF) » (EF-A06). */
     @FXML
     private void onExporterPdf() {
-        AlertUtil.info("L'export PDF sera disponible quand PdfUtil sera livré (itération 3).");
+        if (donnees == null) {
+            AlertUtil.error("Les données du tableau de bord ne sont pas disponibles.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Enregistrer le tableau de bord");
+        chooser.setInitialFileName("tableau-de-bord.pdf");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier PDF", "*.pdf"));
+        File fichier = chooser.showSaveDialog(table.getScene().getWindow());
+        if (fichier == null) {
+            return;
+        }
+        if (!fichier.getName().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+            fichier = new File(fichier.getParentFile(), fichier.getName() + ".pdf");
+        }
+
+        List<String[]> lignesPdf = donnees.lignes().stream()
+                .map(ligne -> new String[] {
+                    ligne.ferme(),
+                    ligne.responsable() == null ? VIDE : ligne.responsable(),
+                    quantite(ligne.surface(), "m²"),
+                    quantite(ligne.production(), "kg"),
+                    quantite(ligne.stock(), "kg"),
+                    montant(ligne.depenses()),
+                    montant(ligne.benefice()),
+                    ligne.effectif() == null ? VIDE
+                            : ligne.effectif() + (ligne.effectif() > 1 ? " ouvriers" : " ouvrier")
+                })
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        if (!donnees.lignes().isEmpty()) {
+            LigneFerme total = ligneTotal(donnees.lignes());
+            lignesPdf.add(new String[] {
+                total.ferme(), VIDE, quantite(total.surface(), "m²"), quantite(total.production(), "kg"),
+                quantite(total.stock(), "kg"), montant(total.depenses()), montant(total.benefice()),
+                total.effectif() == null ? VIDE
+                        : total.effectif() + (total.effectif() > 1 ? " ouvriers" : " ouvrier")
+            });
+        }
+
+        try {
+            PdfUtil.exportTableau("Tableau de bord - Performances par ferme",
+                    new String[] {"Ferme", "Responsable", "Surface", "Production", "Stock",
+                            "Dépenses", "Bénéfice", "Effectif"},
+                    lignesPdf, fichier.toPath());
+            AlertUtil.info("Tableau de bord enregistré :\n" + fichier.getAbsolutePath());
+        } catch (RuntimeException e) {
+            AlertUtil.error(e.getMessage());
+        }
     }
 
     @FXML
