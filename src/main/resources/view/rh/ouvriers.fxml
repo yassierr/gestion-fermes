@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ma.ferme.controller.rh.OuvrierController"
+      spacing="16">
+
+    <!-- Barre d'actions et filtres -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+        <TextField fx:id="txtRecherche" promptText="Rechercher par nom, CIN ou matricule..."
+                   prefWidth="300" prefHeight="36"/>
+        <CheckBox fx:id="chkActifsUniquement" text="Afficher uniquement les actifs" selected="true"/>
+        <Label fx:id="lblCompteur" text="0 ouvriers" style="-fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ Ajouter un ouvrier" onAction="#onAjouterOuvrier" prefHeight="36"
+                style="-fx-background-color: #1b5e20; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 0 16;"/>
+    </HBox>
+
+    <!-- Panneau de pointage journalier -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+        <Label text="Pointage rapide :" style="-fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+        <DatePicker fx:id="dpDatePointage" prefWidth="150"/>
+        <ComboBox fx:id="cbStatutPointage" prefWidth="150"/>
+        <Button text="Enregistrer le pointage" onAction="#onEnregistrerPointage" prefHeight="34"
+                style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 0 14;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Activer / Désactiver" onAction="#onBasculerStatut" prefHeight="34"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 0 12;"/>
+        <Button text="Supprimer" onAction="#onSupprimerOuvrier" prefHeight="34"
+                style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 0 12;"/>
+    </HBox>
+
+    <!-- Tableau des ouvriers -->
+    <VBox VBox.vgrow="ALWAYS"
+          style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+        <TableView fx:id="tableOuvriers" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colMatricule" text="Matricule" prefWidth="120"/>
+                <TableColumn fx:id="colCin" text="CIN" prefWidth="120"/>
+                <TableColumn fx:id="colNomPrenom" text="Nom &amp; Prénom" prefWidth="220"/>
+                <TableColumn fx:id="colTelephone" text="Téléphone" prefWidth="140"/>
+                <TableColumn fx:id="colSalaire" text="Salaire / jour (MAD)" prefWidth="150"/>
+                <TableColumn fx:id="colPointageDate" text="Pointage (date)" prefWidth="140"/>
+                <TableColumn fx:id="colStatut" text="État" prefWidth="110"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>
