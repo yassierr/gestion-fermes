@@ -3,6 +3,10 @@
 
 .login-root {
     -fx-background-color: #EAF3E6;
+    -fx-background-image: url("../images/image-login-blurred.jfif");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
     -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
