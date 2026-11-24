@@ -20,14 +20,14 @@
   Écran « Récoltes » du responsable (maquette « Récoltes »).
   Chargé dans la zone centrale de responsable-main.fxml : la barre latérale n'est pas ici.
   Contrôleur : ma.ferme.controller.responsable.RecolteController
-  Styles     : css/recoltes.css (classes communes aux écrans du responsable)
+  Styles     : css/recoltes.css
 -->
 <ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="ma.ferme.controller.responsable.RecolteController"
             fx:id="scrollPage" styleClass="page" fitToWidth="true" hbarPolicy="NEVER">
 
     <stylesheets>
-        <URL value="C:\Users\AD\Desktop\gestion-fermes\src\main\resources\css\recoltes.css"/>
+        <URL value="@../../css/recoltes.css"/>
     </stylesheets>
 
     <VBox spacing="24.0" styleClass="page-content">
@@ -125,15 +125,6 @@
                 </columns>
             </TableView>
 
-            <HBox styleClass="table-footer" alignment="CENTER_LEFT">
-                <Label fx:id="lblPagination" text="Aucune pesée" styleClass="pagination-info"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <HBox spacing="6.0" alignment="CENTER_RIGHT">
-                    <Button fx:id="btnPrecedent" text="‹" styleClass="page-btn" onAction="#onPagePrecedente"/>
-                    <HBox fx:id="boxPages" spacing="6.0" alignment="CENTER"/>
-                    <Button fx:id="btnSuivant" text="›" styleClass="page-btn" onAction="#onPageSuivante"/>
-                </HBox>
-            </HBox>
         </VBox>
     </VBox>
 </ScrollPane>

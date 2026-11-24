@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!--
+  Écran « Tableau de bord » du responsable de ferme (maquette « Tableau de bord »).
+  Chargé dans la zone centrale de responsable-main.fxml : la barre latérale et la barre de date n'y sont pas.
+  Contrôleur : ma.ferme.controller.responsable.DashboardResponsableController
+  fx:id utilisés par le contrôleur : lblMois, lblAvertissement, lblChiffreAffaires, lblDepenses,
+                                      lblMainOeuvre, lblBenefice, lblStock, lblRendement, chartProduction
+  Styles     : css/dashboard-responsable.css
+-->
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.ferme.controller.responsable.DashboardResponsableController"
+            styleClass="page" fitToWidth="true" hbarPolicy="NEVER">
+
+    <stylesheets>
+        <URL value="@../../css/dashboard-responsable.css"/>
+    </stylesheets>
+
+    <VBox spacing="22.0" styleClass="page-content">
+        <padding>
+            <Insets top="28.0" right="36.0" bottom="48.0" left="36.0"/>
+        </padding>
+
+        <!-- En-tête : titre + mois affiché -->
+        <HBox styleClass="card, header-card" alignment="CENTER_LEFT" spacing="12.0">
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Circle radius="4.0" styleClass="puce"/>
+                    <Label text="Tableau de bord" styleClass="page-title"/>
+                </HBox>
+                <Label text="Aperçu de la production maraîchère, livraisons et indicateurs clés du mois"
+                       styleClass="page-subtitle" wrapText="true"/>
+            </VBox>
+            <Label fx:id="lblMois" text="" styleClass="mois-badge"/>
+        </HBox>
+
+        <!-- Avertissement (affiché ou masqué par le contrôleur) -->
+        <Label fx:id="lblAvertissement" text="" styleClass="avertissement" wrapText="true" maxWidth="Infinity"/>
+
+        <!-- Indicateurs : 2 lignes x 3 cartes -->
+        <GridPane hgap="20.0" vgap="20.0">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <!-- Chiffre d'affaires -->
+            <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="card, kpi-card" spacing="16.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Chiffre d'affaires" styleClass="kpi-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="icon-box, icon-vert" minWidth="34.0" minHeight="34.0"
+                               prefWidth="34.0" prefHeight="34.0" maxWidth="34.0" maxHeight="34.0">
+                        <SVGPath styleClass="icone, icone-vert" content="M23 6l-9.5 9.5-5-5L1 18 M17 6h6v6"/>
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblChiffreAffaires" text="0.00 MAD" styleClass="kpi-value"/>
+            </VBox>
+
+            <!-- Dépenses -->
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="card, kpi-card" spacing="16.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Dépenses" styleClass="kpi-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="icon-box, icon-bleu" minWidth="34.0" minHeight="34.0"
+                               prefWidth="34.0" prefHeight="34.0" maxWidth="34.0" maxHeight="34.0">
+                        <SVGPath styleClass="icone, icone-bleu"
+                                 content="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M1 10h22"/>
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblDepenses" text="0.00 MAD" styleClass="kpi-value"/>
+            </VBox>
+
+            <!-- Main-d'œuvre -->
+            <VBox GridPane.columnIndex="2" GridPane.rowIndex="0" styleClass="card, kpi-card" spacing="16.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Main-d'œuvre" styleClass="kpi-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="icon-box, icon-bleu" minWidth="34.0" minHeight="34.0"
+                               prefWidth="34.0" prefHeight="34.0" maxWidth="34.0" maxHeight="34.0">
+                        <SVGPath styleClass="icone, icone-bleu"
+                                 content="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8a4 4 0 1 0 0-8 M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblMainOeuvre" text="0.00 MAD" styleClass="kpi-value"/>
+            </VBox>
+
+            <!-- Bénéfice net -->
+            <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="card, kpi-card" spacing="16.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Bénéfice net" styleClass="kpi-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="icon-box, icon-vert" minWidth="34.0" minHeight="34.0"
+                               prefWidth="34.0" prefHeight="34.0" maxWidth="34.0" maxHeight="34.0">
+                        <SVGPath styleClass="icone, icone-vert"
+                                 content="M3 4h18v16H3z M16 12h5 M7 9h4 M7 13h4"/>
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblBenefice" text="0.00 MAD" styleClass="kpi-value"/>
+            </VBox>
+
+            <!-- Stock disponible -->
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="card, kpi-card" spacing="16.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Stock disponible" styleClass="kpi-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="icon-box, icon-bleu" minWidth="34.0" minHeight="34.0"
+                               prefWidth="34.0" prefHeight="34.0" maxWidth="34.0" maxHeight="34.0">
+                        <SVGPath styleClass="icone, icone-bleu" content="M21 8v13H3V8 M1 3h22v5H1z M10 12h4"/>
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblStock" text="0.00 kg" styleClass="kpi-value"/>
+            </VBox>
+
+            <!-- Rendement -->
+            <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" styleClass="card, kpi-card" spacing="16.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Rendement" styleClass="kpi-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="icon-box, icon-vert" minWidth="34.0" minHeight="34.0"
+                               prefWidth="34.0" prefHeight="34.0" maxWidth="34.0" maxHeight="34.0">
+                        <SVGPath styleClass="icone, icone-vert" content="M3 21V3l18 18z M7 17h3 M7 13h1"/>
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblRendement" text="0.00 kg/m²" styleClass="kpi-value"/>
+            </VBox>
+        </GridPane>
+
+        <!-- Courbe de production hebdomadaire -->
+        <VBox styleClass="card, chart-card" spacing="14.0">
+            <VBox spacing="4.0">
+                <Label text="Production hebdomadaire" styleClass="section-title"/>
+                <Label text="Kilogrammes récoltés par semaine sur les 8 dernières semaines"
+                       styleClass="page-subtitle" wrapText="true"/>
+            </VBox>
+            <LineChart fx:id="chartProduction" styleClass="graphique" prefHeight="300.0"
+                       minHeight="260.0" createSymbols="true" horizontalGridLinesVisible="true"
+                       verticalGridLinesVisible="false">
+                <xAxis>
+                    <CategoryAxis side="BOTTOM" label="Semaine (début)"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis side="LEFT" label="kg"/>
+                </yAxis>
+            </LineChart>
+        </VBox>
+    </VBox>
+</ScrollPane>
