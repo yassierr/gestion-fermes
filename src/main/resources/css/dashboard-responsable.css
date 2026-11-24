@@ -1,0 +1,174 @@
+/* Styles de l'écran Tableau de bord du responsable (dashboard-responsable.fxml).
+   Couleurs reprises de la maquette : vert #2E6B34, texte #182334, gris #64748B,
+   fond de page #F8FAFC, bordures #F1F5F9 / #E2E8F0. */
+
+/* ---------- page ---------- */
+.page {
+    -fx-background-color: #F8FAFC;
+    -fx-background: #F8FAFC;
+    -fx-padding: 0;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13.5px;
+}
+
+.page > .viewport {
+    -fx-background-color: #F8FAFC;
+}
+
+.page-content {
+    -fx-background-color: #F8FAFC;
+}
+
+.page-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #182334;
+}
+
+.page-subtitle {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: #64748B;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+/* ---------- cartes ---------- */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 4, 0, 0, 1);
+}
+
+/* ---------- en-tête ---------- */
+.header-card {
+    -fx-padding: 22 28 22 28;
+}
+
+.puce {
+    -fx-fill: #2E6B34;
+}
+
+.mois-badge {
+    -fx-background-color: #EAF4EB;
+    -fx-background-radius: 999;
+    -fx-text-fill: #2E6B34;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 16 6 16;
+}
+
+/* ---------- avertissement ---------- */
+.avertissement {
+    -fx-background-color: #FFFBEB;
+    -fx-background-radius: 10;
+    -fx-border-color: #FCD34D;
+    -fx-border-radius: 10;
+    -fx-text-fill: #92400E;
+    -fx-font-size: 12.5px;
+    -fx-padding: 12 18 12 18;
+}
+
+/* ---------- cartes d'indicateurs ---------- */
+.kpi-card {
+    -fx-padding: 20 24 22 24;
+}
+
+.kpi-label {
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #64748B;
+}
+
+.kpi-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #182334;
+}
+
+/* Le contrôleur ajoute l'une de ces deux classes sur le bénéfice net. */
+.kpi-value.valeur-positive {
+    -fx-text-fill: #2E6B34;
+}
+
+.kpi-value.valeur-negative {
+    -fx-text-fill: #DC2626;
+}
+
+.icon-box {
+    -fx-background-radius: 9;
+}
+
+.icon-vert {
+    -fx-background-color: #DCFCE7;
+}
+
+.icon-bleu {
+    -fx-background-color: #E8EEFB;
+}
+
+/* ---------- icônes (trait seul) ---------- */
+.icone {
+    -fx-fill: transparent;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+
+.icone-vert {
+    -fx-stroke: #2E6B34;
+}
+
+.icone-bleu {
+    -fx-stroke: #4A5FA8;
+}
+
+/* ---------- graphique ---------- */
+.chart-card {
+    -fx-padding: 22 26 22 26;
+}
+
+.graphique {
+    -fx-background-color: transparent;
+}
+
+.graphique .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.graphique .chart-horizontal-grid-lines {
+    -fx-stroke: #F1F5F9;
+}
+
+.graphique .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.graphique .axis {
+    -fx-tick-label-fill: #64748B;
+    -fx-tick-label-font-size: 11px;
+}
+
+.graphique .axis-label {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+}
+
+.graphique .default-color0.chart-series-line {
+    -fx-stroke: #2E6B34;
+    -fx-stroke-width: 2.5px;
+}
+
+.graphique .default-color0.chart-line-symbol {
+    -fx-background-color: #2E6B34, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px;
+}
