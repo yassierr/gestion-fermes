@@ -41,6 +41,7 @@ class RecuPaieServiceTest {
     @AfterEach
     void tearDown() {
         if (suffixe == null) return;
+        TestSupport.executer("DELETE FROM ligne_paie WHERE id_recu IN (SELECT id FROM recu_paie WHERE id_ferme = " + idFerme + ")");
         TestSupport.executer("DELETE FROM recu_paie WHERE id_ferme = " + idFerme);
         TestSupport.executer("DELETE FROM ouvrier WHERE id = " + idOuvrier);
         TestSupport.executer("DELETE FROM utilisateur WHERE id = " + idAgent);
