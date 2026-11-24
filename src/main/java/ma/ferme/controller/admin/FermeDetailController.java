@@ -17,6 +17,7 @@ import ma.ferme.dao.SerreDao;
 import ma.ferme.model.Ferme;
 import ma.ferme.model.Serre;
 import ma.ferme.service.SerreService;
+import ma.ferme.util.AlertUtil;
 import ma.ferme.util.SceneNavigator;
 
 import java.util.List;
@@ -132,15 +133,18 @@ public class FermeDetailController {
     }
 
     @FXML
-    private void handleRetourFermes() {
+    private void handleRetourDashboard() {
         try {
-            Node fermesView = SceneNavigator.load("/view/admin/fermes.fxml");
+            Node dashboardView = SceneNavigator.load("/view/admin/dashboard-admin.fxml");
             StackPane contentStack = (StackPane) lblNomFerme.getScene().lookup("#rootContentStack");
             if (contentStack != null) {
-                contentStack.getChildren().setAll(fermesView);
+                contentStack.getChildren().setAll(dashboardView);
+            } else {
+                AlertUtil.error("Impossible de trouver la zone d'affichage du tableau de bord.");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            AlertUtil.error("Impossible de retourner au tableau de bord : " + e.getMessage());
         }
     }
 }

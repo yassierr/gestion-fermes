@@ -1,10 +1,10 @@
 package ma.ferme.controller.admin;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -18,7 +18,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -32,15 +34,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import ma.ferme.dao.DaoException;
-import ma.ferme.dao.FermeDao;
 import ma.ferme.model.Ferme;
 import ma.ferme.security.Session;
-import ma.ferme.service.FermeService;
+import ma.ferme.service.DashboardAdminService;
+import ma.ferme.service.DashboardAdminService.Donnees;
+import ma.ferme.service.DashboardAdminService.LigneFerme;
 import ma.ferme.util.AlertUtil;
 import ma.ferme.util.PdfUtil;
 
@@ -51,13 +55,6 @@ import ma.ferme.util.PdfUtil;
  * production par variété, tableau « Performances et rentabilité par ferme » avec ligne de total,
  * recherche et pagination. Une valeur absente ({@code null}) s'affiche « — », jamais « 0 ».
  * </p>
- * <p>
- * Données : pour l'instant seules les fermes viennent d'un service ({@link FermeService}). Le reste
- * est à brancher dans {@link #chargerDonnees()} quand les services correspondants seront livrés
- * (chiffre d'affaires et stock : ventes ; surface : serres ; production : récoltes ; dépenses ;
- * effectif : ouvriers ; masse salariale : reçus de paie ; responsable : comptes). Le bénéfice se calcule
- * avec RG-19 : chiffre d'affaires − dépenses − reçus de paie.
- * </p>
  */
 public class DashboardAdminController {
 
@@ -65,44 +62,6 @@ public class DashboardAdminController {
 
     private static final int TAILLE_PAGE = 10;
     private static final String VIDE = "—";
-
-    /**
-     * Une ligne du tableau de performances.
-     *
-     * @param idFerme         identifiant de la ferme (0 pour la ligne de total)
-     * @param ferme           nom de la ferme
-     * @param responsable     nom du responsable ({@code null} si inconnu)
-     * @param surface         surface totale en m²
-     * @param production      production totale en kg
-     * @param stock           stock disponible en kg
-     * @param depenses        dépenses en MAD
-     * @param benefice        bénéfice en MAD
-     * @param chiffreAffaires chiffre d'affaires en MAD
-     * @param effectif        nombre d'ouvriers
-     * @param total           {@code true} pour la ligne de total
-     */
-    record LigneFerme(int idFerme, String ferme, String responsable, BigDecimal surface, BigDecimal production,
-                      BigDecimal stock, BigDecimal depenses, BigDecimal benefice, BigDecimal chiffreAffaires,
-                      Integer effectif, boolean total) {
-    }
-
-    /**
-     * Toutes les données affichées par le tableau de bord.
-     *
-     * @param chiffreAffaires    chiffre d'affaires global
-     * @param benefice           bénéfice net global
-     * @param masseSalariale     masse salariale globale
-     * @param nbFermes           nombre de fermes
-     * @param surface            surface totale
-     * @param stock              stock disponible total
-     * @param effectif           effectif total des ouvriers
-     * @param lignes             une ligne par ferme
-     * @param productionParVariete production en kg par variété
-     */
-    record Donnees(BigDecimal chiffreAffaires, BigDecimal benefice, BigDecimal masseSalariale, int nbFermes,
-                   BigDecimal surface, BigDecimal stock, Integer effectif, List<LigneFerme> lignes,
-                   Map<String, BigDecimal> productionParVariete) {
-    }
 
     @FXML private Label lblChiffreAffaires;
     @FXML private Label lblBenefice;
@@ -131,7 +90,7 @@ public class DashboardAdminController {
     @FXML private Label lblPage;
     @FXML private Button btnSuivant;
 
-    private final FermeService fermeService;
+    private final DashboardAdminService dashboardService;
     private final PauseTransition attenteRecherche = new PauseTransition(Duration.millis(250));
 
     private Donnees donnees;
@@ -140,17 +99,16 @@ public class DashboardAdminController {
 
     /** Constructeur sans argument, requis par FXMLLoader. */
     public DashboardAdminController() {
-        // FermeService n'a pas encore de constructeur par défaut (contrat du projet) : à simplifier ensuite.
-        this(new FermeService(new FermeDao()));
+        this(new DashboardAdminService());
     }
 
     /**
      * Constructeur avec service injecté (utile pour les tests).
      *
-     * @param fermeService le service des fermes
+     * @param dashboardService le service du tableau de bord
      */
-    public DashboardAdminController(FermeService fermeService) {
-        this.fermeService = fermeService;
+    public DashboardAdminController(DashboardAdminService dashboardService) {
+        this.dashboardService = dashboardService;
     }
 
     /** Appelée par JavaFX après le chargement du FXML. */
@@ -169,7 +127,7 @@ public class DashboardAdminController {
             return;
         }
         try {
-            donnees = chargerDonnees();
+            donnees = dashboardService.chargerDonnees();
             afficherCartes();
             afficherChiffreAffairesParFerme();
             afficherProduction();
@@ -255,48 +213,33 @@ public class DashboardAdminController {
         }
     }
 
-    /** Clic sur « Consulter » : doit ouvrir la fiche détaillée de la ferme (écran de Brahim). */
+    /** Ouvre la fiche détaillée de la ferme sélectionnée. */
     private void onConsulter(LigneFerme ligne) {
-        AlertUtil.info("Fiche détaillée de « " + ligne.ferme()
-                + " » : à relier à /view/admin/ferme-detail.fxml.");
-    }
-
-    // ------------------------------------------------------------------
-    // Données
-    // ------------------------------------------------------------------
-
-    /**
-     * Rassemble les données du tableau de bord.
-     * <p>
-     * Pour l'instant : la liste et le nombre de fermes. Chaque {@code null} ci-dessous est à remplacer
-     * par la valeur du service concerné ; l'affichage et les totaux s'adaptent seuls.
-     * </p>
-     */
-    private Donnees chargerDonnees() {
-        List<Ferme> fermes = fermeService.obtenirToutesLesFermes();
-        List<LigneFerme> lignes = new ArrayList<>();
-        for (Ferme ferme : fermes) {
-            lignes.add(new LigneFerme(ferme.getId(), ferme.getNom(),
-                    null,   // responsable : comptes
-                    null,   // surface : serres
-                    null,   // production : récoltes
-                    null,   // stock disponible : récoltes − lignes de vente non annulées (RG-01)
-                    null,   // dépenses : dépenses
-                    null,   // bénéfice : RG-19
-                    null,   // chiffre d'affaires : lignes de vente livrées (RG-08)
-                    null,   // effectif : ouvriers actifs
-                    false));
+        if (ligne == null || ligne.total()) {
+            return;
         }
-        return new Donnees(
-                somme(lignes, LigneFerme::chiffreAffaires),
-                somme(lignes, LigneFerme::benefice),
-                null,       // masse salariale : reçus de paie (RG-18)
-                fermes.size(),
-                somme(lignes, LigneFerme::surface),
-                somme(lignes, LigneFerme::stock),
-                sommeEntiers(lignes, LigneFerme::effectif),
-                lignes,
-                new LinkedHashMap<>()); // production par variété : récoltes
+
+        try {
+            Ferme ferme = dashboardService.obtenirFermeParId(ligne.idFerme()).orElse(null);
+            if (ferme == null) {
+                AlertUtil.error("Cette ferme n'existe plus.");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/admin/ferme-detail.fxml"));
+            Parent detailView = loader.load();
+            loader.<FermeDetailController>getController().initData(ferme);
+
+            StackPane contentStack = (StackPane) table.getScene().lookup("#rootContentStack");
+            if (contentStack == null) {
+                AlertUtil.error("Impossible de trouver la zone d'affichage de la fiche ferme.");
+                return;
+            }
+            contentStack.getChildren().setAll(detailView);
+        } catch (IOException | DaoException e) {
+            LOG.log(Level.SEVERE, "Impossible d'ouvrir la fiche de la ferme " + ligne.idFerme(), e);
+            AlertUtil.error("Impossible d'ouvrir la fiche ferme : " + e.getMessage());
+        }
     }
 
     // ------------------------------------------------------------------
@@ -349,7 +292,7 @@ public class DashboardAdminController {
         chartProduction.getData().clear();
         Map<String, BigDecimal> production = donnees.productionParVariete();
         BigDecimal total = production.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-        lblTotalProduction.setText(production.isEmpty() ? "Total : " + VIDE : "Total : " + quantite(total, "kg"));
+        lblTotalProduction.setText("Total : " + quantite(total, "kg"));
 
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
         int rang = 0;

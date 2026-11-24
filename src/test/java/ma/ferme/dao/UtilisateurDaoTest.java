@@ -183,6 +183,16 @@ class UtilisateurDaoTest {
         assertTrue(dao.findByFermeAndRole(Integer.MAX_VALUE, RoleUtilisateur.RESPONSABLE).isEmpty());
     }
 
+    @Test
+    @DisplayName("nomsResponsablesParFerme : retourne uniquement le nom et la ferme du responsable")
+    void nomsResponsablesParFerme() {
+        Utilisateur resp = enregistrer(
+                new ResponsableFerme("Responsable Dashboard", nouveauLogin("dashresp"), HASH, idFermeTest));
+
+        assertEquals("Responsable Dashboard", dao.nomsResponsablesParFerme().get(idFermeTest));
+        assertTrue(resp.getId() > 0);
+    }
+
     // ------------------------------------------------------------------
     // findAll / search / count
     // ------------------------------------------------------------------

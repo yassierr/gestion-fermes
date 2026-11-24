@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import ma.ferme.config.DatabaseConnection;
@@ -155,6 +157,28 @@ public class RecolteDao implements GenericDao<Recolte> {
             }
         } catch (SQLException e) {
             throw new DaoException("Impossible de calculer le total récolté.", e);
+        }
+    }
+
+    /**
+     * Total récolté par variété, toutes fermes confondues.
+     *
+     * @return les kilos récoltés par variété, triés par nom de variété
+     * @throws DaoException en cas d'erreur SQL
+     */
+    public Map<String, BigDecimal> productionParVariete() {
+        String sql = "SELECT variete, SUM(poids_kg) AS total_kg "
+                + "FROM recolte GROUP BY variete ORDER BY variete";
+        Map<String, BigDecimal> resultat = new LinkedHashMap<>();
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultat.put(rs.getString("variete"), rs.getBigDecimal("total_kg"));
+            }
+            return resultat;
+        } catch (SQLException e) {
+            throw new DaoException("Impossible de calculer la production par variété.", e);
         }
     }
 
