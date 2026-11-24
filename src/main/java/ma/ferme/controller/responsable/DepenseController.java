@@ -8,14 +8,17 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import ma.ferme.dao.DaoException;
@@ -27,24 +30,9 @@ import ma.ferme.util.AlertUtil;
 import ma.ferme.util.Formats;
 import ma.ferme.util.SceneNavigator;
 
-/**
- * Écran « Dépenses » du responsable (EFR09, EFR10) : liste avec recherche, filtre par catégorie et
- * par période, total du mois, et fenêtre modale « Nouvelle dépense ».
- * <p>
- * Ce contrôleur sert deux fichiers FXML : {@code depenses.fxml} (la liste) et
- * {@code depense-form.fxml} (la modale d'ajout / de modification). Seuls les champs présents dans
- * le FXML chargé sont renseignés par JavaFX : {@link #initialize()} détecte le mode.
- * La dépense à modifier est transmise à la modale par {@link #aModifier}.
- * </p>
- *
- * @author Mohamed Amine Ait Maait
- * @version 1.0
- */
 public class DepenseController {
 
     private static final String FORMULAIRE = "/view/responsable/depense-form.fxml";
-
-    /** Dépense transmise à la modale pour la modifier ; {@code null} pour une nouvelle dépense. */
     private static Depense aModifier;
 
     private final DepenseService service = new DepenseService();
@@ -55,6 +43,7 @@ public class DepenseController {
     @FXML private TableColumn<Depense, String> colCategorie;
     @FXML private TableColumn<Depense, String> colDescription;
     @FXML private TableColumn<Depense, String> colMontant;
+    @FXML private TableColumn<Depense, Void> colActions;
     @FXML private TextField txtRecherche;
     @FXML private ComboBox<CategorieDepense> cmbFiltreCategorie;
     @FXML private DatePicker dpDebut;
@@ -71,10 +60,8 @@ public class DepenseController {
     @FXML private TextArea txtDescription;
     @FXML private Button btnEnregistrer;
 
-    /** Dépense en cours de modification dans la modale, ou {@code null}. */
     private Depense enEdition;
 
-    /** Détecte le FXML chargé (liste ou modale) et prépare ses champs. */
     @FXML
     private void initialize() {
         if (tableDepenses != null) {
@@ -93,46 +80,86 @@ public class DepenseController {
         colDescription.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getDescription()));
         colMontant.setCellValueFactory(c -> new ReadOnlyStringWrapper(Formats.mad(c.getValue().getMontant())));
         colMontant.setStyle("-fx-alignment: CENTER-RIGHT;");
+        configurerColonneActions();
 
-        // premier élément null = « toutes les catégories »
-        cmbFiltreCategorie.getItems().add(null);
-        cmbFiltreCategorie.getItems().addAll(CategorieDepense.values());
-        cmbFiltreCategorie.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategorieDepense c) {
-                return c == null ? "Toutes les catégories" : c.getLibelle();
-            }
+        if (cmbFiltreCategorie != null) {
+            cmbFiltreCategorie.getItems().add(null);
+            cmbFiltreCategorie.getItems().addAll(CategorieDepense.values());
+            cmbFiltreCategorie.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(CategorieDepense c) {
+                    return c == null ? "Toutes les catégories" : c.getLibelle();
+                }
 
-            @Override
-            public CategorieDepense fromString(String texte) {
-                return null;
-            }
-        });
-
-        txtRecherche.textProperty().addListener((obs, ancien, nouveau) -> filtrer());
-        cmbFiltreCategorie.valueProperty().addListener((obs, ancien, nouveau) -> filtrer());
-        dpDebut.valueProperty().addListener((obs, ancien, nouveau) -> filtrer());
-        dpFin.valueProperty().addListener((obs, ancien, nouveau) -> filtrer());
+                @Override
+                public CategorieDepense fromString(String texte) {
+                    return null;
+                }
+            });
+            cmbFiltreCategorie.valueProperty().addListener((obs, ancien, nouveau) -> filtrer());
+        }
+        if (txtRecherche != null) {
+            txtRecherche.textProperty().addListener((obs, ancien, nouveau) -> filtrer());
+        }
+        if (dpDebut != null) {
+            dpDebut.valueProperty().addListener((obs, ancien, nouveau) -> filtrer());
+        }
+        if (dpFin != null) {
+            dpFin.valueProperty().addListener((obs, ancien, nouveau) -> filtrer());
+        }
         filtrer();
     }
 
-    /** Recharge la liste selon la recherche, la catégorie et la période, et met à jour les totaux. */
+    private void configurerColonneActions() {
+        if (colActions == null) {
+            return;
+        }
+        colActions.setCellFactory(col -> new TableCell<>() {
+            private final Button btnEdit = new Button("✎");
+            private final Button btnDel = new Button("🗑");
+            private final HBox box = new HBox(8, btnEdit, btnDel);
+
+            {
+                box.setAlignment(Pos.CENTER_RIGHT);
+                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #374151;");
+                btnDel.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #dc2626;");
+                btnEdit.setOnAction(e -> modifierLigne(getTableView().getItems().get(getIndex())));
+                btnDel.setOnAction(e -> supprimerLigne(getTableView().getItems().get(getIndex())));
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
+    }
+
     private void filtrer() {
         try {
             ResponsableFerme acteur = ResponsableMainController.acteurConnecte();
-            List<Depense> depenses = service.rechercher(acteur, txtRecherche.getText(),
-                    cmbFiltreCategorie.getValue(), dpDebut.getValue(), dpFin.getValue());
+            String recherche = txtRecherche != null ? txtRecherche.getText() : null;
+            CategorieDepense categorie = cmbFiltreCategorie != null ? cmbFiltreCategorie.getValue() : null;
+            LocalDate debut = dpDebut != null ? dpDebut.getValue() : null;
+            LocalDate fin = dpFin != null ? dpFin.getValue() : null;
+
+            List<Depense> depenses = service.rechercher(acteur, recherche, categorie, debut, fin);
             tableDepenses.setItems(FXCollections.observableArrayList(depenses));
-            lblNombre.setText(depenses.size() + (depenses.size() > 1 ? " dépenses" : " dépense"));
-            BigDecimal total = depenses.stream().map(Depense::getMontant).reduce(BigDecimal.ZERO, BigDecimal::add);
-            lblTotalFiltre.setText(Formats.mad(total));
-            lblTotalMois.setText(Formats.mad(service.totalDuMois(acteur, YearMonth.now())));
+            if (lblNombre != null) {
+                lblNombre.setText(depenses.size() + (depenses.size() > 1 ? " dépenses" : " dépense"));
+            }
+            if (lblTotalFiltre != null) {
+                BigDecimal total = depenses.stream().map(Depense::getMontant).reduce(BigDecimal.ZERO, BigDecimal::add);
+                lblTotalFiltre.setText(Formats.mad(total));
+            }
+            if (lblTotalMois != null) {
+                lblTotalMois.setText(Formats.nombre(service.totalDuMois(acteur, YearMonth.now())));
+            }
         } catch (SecurityException | DaoException e) {
             AlertUtil.error(e.getMessage());
         }
     }
 
-    /** Ouvre la modale pour saisir une nouvelle dépense. */
     @FXML
     private void onNouvelle() {
         aModifier = null;
@@ -140,7 +167,6 @@ public class DepenseController {
         filtrer();
     }
 
-    /** Ouvre la modale pour modifier la dépense sélectionnée. */
     @FXML
     private void onModifier() {
         Depense choisie = tableDepenses.getSelectionModel().getSelectedItem();
@@ -148,6 +174,10 @@ public class DepenseController {
             AlertUtil.info("Sélectionnez d'abord une dépense dans la liste.");
             return;
         }
+        modifierLigne(choisie);
+    }
+
+    private void modifierLigne(Depense choisie) {
         aModifier = choisie;
         try {
             SceneNavigator.openModal(FORMULAIRE, "Modifier la dépense");
@@ -157,7 +187,6 @@ public class DepenseController {
         filtrer();
     }
 
-    /** Supprime la dépense sélectionnée après confirmation. */
     @FXML
     private void onSupprimer() {
         Depense choisie = tableDepenses.getSelectionModel().getSelectedItem();
@@ -165,6 +194,10 @@ public class DepenseController {
             AlertUtil.info("Sélectionnez d'abord une dépense dans la liste.");
             return;
         }
+        supprimerLigne(choisie);
+    }
+
+    private void supprimerLigne(Depense choisie) {
         if (!AlertUtil.confirm("Supprimer la dépense « " + choisie.getCategorie().getLibelle() + " » de "
                 + Formats.mad(choisie.getMontant()) + " ?")) {
             return;
@@ -177,13 +210,12 @@ public class DepenseController {
         }
     }
 
-    /** Efface la recherche et les filtres. */
     @FXML
     private void onReinitialiser() {
-        txtRecherche.clear();
-        cmbFiltreCategorie.setValue(null);
-        dpDebut.setValue(null);
-        dpFin.setValue(null);
+        if (txtRecherche != null) txtRecherche.clear();
+        if (cmbFiltreCategorie != null) cmbFiltreCategorie.setValue(null);
+        if (dpDebut != null) dpDebut.setValue(null);
+        if (dpFin != null) dpFin.setValue(null);
     }
 
     // ================= modale =================
@@ -205,7 +237,6 @@ public class DepenseController {
         }
     }
 
-    /** Enregistre (ou met à jour) la dépense saisie, puis ferme la modale. */
     @FXML
     private void onEnregistrer() {
         try {
@@ -224,7 +255,6 @@ public class DepenseController {
         }
     }
 
-    /** Ferme la modale sans rien enregistrer. */
     @FXML
     private void onAnnuler() {
         fermer();

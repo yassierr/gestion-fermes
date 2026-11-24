@@ -7,12 +7,15 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import ma.ferme.dao.DaoException;
 import ma.ferme.model.Recolte;
 import ma.ferme.model.ResponsableFerme;
@@ -20,15 +23,6 @@ import ma.ferme.service.RecolteService;
 import ma.ferme.util.AlertUtil;
 import ma.ferme.util.Formats;
 
-/**
- * Écran « Récoltes » du responsable (EFR06 à EFR08) : formulaire d'enregistrement, historique
- * des récoltes de la ferme et stock disponible. Une ligne de l'historique peut être modifiée
- * (le formulaire passe en mode édition) ou supprimée. Les règles (droits, RG-07 : stock jamais
- * négatif) sont dans {@link RecolteService} ; ce contrôleur ne fait qu'afficher et relayer.
- *
- * @author Mohamed Amine Ait Maait
- * @version 1.0
- */
 public class RecolteController {
 
     private static final DateTimeFormatter DATE_HEURE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -46,23 +40,47 @@ public class RecolteController {
     @FXML private TableColumn<Recolte, String> colDate;
     @FXML private TableColumn<Recolte, String> colVariete;
     @FXML private TableColumn<Recolte, String> colPoids;
+    @FXML private TableColumn<Recolte, Void> colActions;
 
-    /** Récolte en cours de modification, ou {@code null} en mode ajout. */
     private Recolte enEdition;
 
-    /** Prépare le tableau et le formulaire, puis charge les données. */
     @FXML
     private void initialize() {
         colDate.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getDateHeure().format(DATE_HEURE)));
         colVariete.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getVariete()));
         colPoids.setCellValueFactory(c -> new ReadOnlyStringWrapper(Formats.nombre(c.getValue().getPoidsKg()) + " kg"));
         colPoids.setStyle("-fx-alignment: CENTER-RIGHT;");
+        configurerColonneActions();
         cmbVariete.setEditable(true);
         passerEnModeAjout();
         rafraichir();
     }
 
-    /** Enregistre une nouvelle récolte, ou applique la modification en cours. */
+    private void configurerColonneActions() {
+        if (colActions == null) {
+            return;
+        }
+        colActions.setCellFactory(col -> new TableCell<>() {
+            private final Button btnEdit = new Button("✎");
+            private final Button btnDel = new Button("🗑");
+            private final HBox box = new HBox(8, btnEdit, btnDel);
+
+            {
+                box.setAlignment(Pos.CENTER_RIGHT);
+                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #374151;");
+                btnDel.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #dc2626;");
+                btnEdit.setOnAction(e -> modifierLigne(getTableView().getItems().get(getIndex())));
+                btnDel.setOnAction(e -> supprimerLigne(getTableView().getItems().get(getIndex())));
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
+    }
+
     @FXML
     private void onEnregistrer() {
         try {
@@ -81,7 +99,6 @@ public class RecolteController {
         }
     }
 
-    /** Charge la récolte sélectionnée dans le formulaire pour la modifier. */
     @FXML
     private void onModifier() {
         Recolte choisie = tableRecoltes.getSelectionModel().getSelectedItem();
@@ -89,6 +106,10 @@ public class RecolteController {
             AlertUtil.info("Sélectionnez d'abord une récolte dans l'historique.");
             return;
         }
+        modifierLigne(choisie);
+    }
+
+    private void modifierLigne(Recolte choisie) {
         enEdition = choisie;
         lblTitreFormulaire.setText("Modifier la récolte");
         btnEnregistrer.setText("Mettre à jour");
@@ -98,7 +119,6 @@ public class RecolteController {
         cmbVariete.getEditor().setText(choisie.getVariete());
     }
 
-    /** Supprime la récolte sélectionnée après confirmation (refusé si le stock devient négatif). */
     @FXML
     private void onSupprimer() {
         Recolte choisie = tableRecoltes.getSelectionModel().getSelectedItem();
@@ -106,6 +126,10 @@ public class RecolteController {
             AlertUtil.info("Sélectionnez d'abord une récolte dans l'historique.");
             return;
         }
+        supprimerLigne(choisie);
+    }
+
+    private void supprimerLigne(Recolte choisie) {
         if (!AlertUtil.confirm("Supprimer la récolte de " + Formats.nombre(choisie.getPoidsKg())
                 + " kg (" + choisie.getVariete() + ") ?")) {
             return;
@@ -119,7 +143,6 @@ public class RecolteController {
         }
     }
 
-    /** Abandonne la modification et vide le formulaire. */
     @FXML
     private void onAnnuler() {
         passerEnModeAjout();
@@ -127,7 +150,7 @@ public class RecolteController {
 
     private void passerEnModeAjout() {
         enEdition = null;
-        lblTitreFormulaire.setText("Enregistrer une récolte");
+        lblTitreFormulaire.setText("Nouvelle récolte");
         btnEnregistrer.setText("Enregistrer");
         btnAnnuler.setVisible(false);
         btnAnnuler.setManaged(false);
@@ -137,15 +160,18 @@ public class RecolteController {
         tableRecoltes.getSelectionModel().clearSelection();
     }
 
-    /** Recharge l'historique, le stock, le total et les variétés proposées. */
     private void rafraichir() {
         try {
             ResponsableFerme acteur = ResponsableMainController.acteurConnecte();
             List<Recolte> recoltes = service.lister(acteur);
             tableRecoltes.setItems(FXCollections.observableArrayList(recoltes));
-            lblStock.setText(Formats.nombre(service.stockDisponible(acteur)) + " kg");
-            BigDecimal total = recoltes.stream().map(Recolte::getPoidsKg).reduce(BigDecimal.ZERO, BigDecimal::add);
-            lblTotal.setText(Formats.nombre(total) + " kg");
+            if (lblStock != null) {
+                lblStock.setText(Formats.nombre(service.stockDisponible(acteur)));
+            }
+            if (lblTotal != null) {
+                BigDecimal total = recoltes.stream().map(Recolte::getPoidsKg).reduce(BigDecimal.ZERO, BigDecimal::add);
+                lblTotal.setText(Formats.nombre(total) + " kg");
+            }
             cmbVariete.setItems(FXCollections.observableArrayList(service.varietes(acteur)));
         } catch (SecurityException | DaoException e) {
             AlertUtil.error(e.getMessage());

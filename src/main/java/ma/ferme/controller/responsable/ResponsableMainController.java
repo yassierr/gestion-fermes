@@ -125,6 +125,7 @@ public class ResponsableMainController {
         try {
             ecran = SceneNavigator.load(fxml);
         } catch (IllegalStateException e) {
+            e.printStackTrace();
             return false;
         }
         zoneContenu.getChildren().setAll(ecran);
