@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.ferme.controller.rh.RhMainController"
+            prefWidth="1280" prefHeight="800"
+            style="-fx-background-color: #f8fafc;">
+
+    <!-- Barre latérale gauche -->
+    <left>
+        <VBox prefWidth="250" spacing="8"
+              style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-border-width: 0 1 0 0;">
+            <padding>
+                <Insets top="24" right="16" bottom="24" left="16"/>
+            </padding>
+
+            <Label text="Gestion des Fermes"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1b5e20;"/>
+            <Label fx:id="lblFerme" text="Ferme : —"
+                   style="-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 0 0 16 0;"/>
+
+            <Button fx:id="navDashboard" text="📊  Tableau de bord"
+                    onAction="#showDashboard" maxWidth="Infinity" alignment="CENTER_LEFT" prefHeight="40"/>
+            <Button fx:id="navOuvriers" text="👷  Ouvriers &amp; Pointage"
+                    onAction="#showOuvriers" maxWidth="Infinity" alignment="CENTER_LEFT" prefHeight="40"/>
+            <Button fx:id="navPaiement" text="💳  Paiement &amp; Reçus"
+                    onAction="#showPaiement" maxWidth="Infinity" alignment="CENTER_LEFT" prefHeight="40"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <VBox spacing="4" style="-fx-padding: 12 8; -fx-background-color: #f1f5f9; -fx-background-radius: 8;">
+                <Label fx:id="lblAgent" text="Agent RH"
+                       style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;"/>
+                <Label text="Espace Agent RH"
+                       style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+            </VBox>
+
+            <Button text="🚪  Se déconnecter" onAction="#logout"
+                    maxWidth="Infinity" prefHeight="38"
+                    style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        </VBox>
+    </left>
+
+    <!-- En-tête + zone de contenu centrale -->
+    <center>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="64"
+                  style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0; -fx-padding: 0 28;">
+                <Label fx:id="pageTitle" text="Tableau de bord RH"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+            </HBox>
+
+            <StackPane fx:id="rootContentStack" VBox.vgrow="ALWAYS"
+                       style="-fx-padding: 24;"/>
+        </VBox>
+    </center>
+</BorderPane>

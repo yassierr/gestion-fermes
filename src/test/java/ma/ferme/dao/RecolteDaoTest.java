@@ -173,6 +173,15 @@ class RecolteDaoTest {
     }
 
     @Test
+    void productionParVarieteAgregeToutesLesFermes() {
+        String variete = "Dash-" + System.nanoTime();
+        dao.insert(new Recolte(idFerme, new BigDecimal("12.25"), variete));
+        dao.insert(new Recolte(idFerme, new BigDecimal("7.75"), variete));
+
+        assertEquals(new BigDecimal("20.00"), dao.productionParVariete().get(variete));
+    }
+
+    @Test
     void fermeInexistanteViolaLaCleEtrangere() {
         Recolte r = new Recolte(999999999, BigDecimal.TEN, "A");
         assertThrows(DaoException.class, () -> dao.insert(r));
