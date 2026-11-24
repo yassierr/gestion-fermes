@@ -26,6 +26,8 @@ import java.util.Locale;
  */
 public class AdminMainController {
 
+    private static final String DASHBOARD_VIEW = "/view/admin/dashboard-admin.fxml";
+    private static final String UTILISATEURS_VIEW = "/view/admin/utilisateurs.fxml";
     private static final String FERMES_VIEW = "/view/admin/fermes.fxml";
     private static final String CLIENTS_LIVRAISONS_VIEW = "/view/admin/clients-livraisons.fxml";
     @FXML private StackPane rootContentStack;
@@ -87,9 +89,14 @@ public class AdminMainController {
     public void showDashboard() {
         setActiveNav(navDashboard);
         pageTitle.setText("Tableau de bord");
-        // Dashboard content intentionally omitted: this section is navigation-only.
-        if (rootContentStack != null) {
-            rootContentStack.getChildren().clear();
+        try {
+            Node dashboard = SceneNavigator.load(DASHBOARD_VIEW);
+            if (rootContentStack != null) {
+                rootContentStack.getChildren().setAll(dashboard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder("Impossible de charger le tableau de bord : " + e.getMessage());
         }
     }
 
@@ -97,7 +104,15 @@ public class AdminMainController {
     public void showUsers() {
         setActiveNav(navUsers);
         pageTitle.setText("Gestion des utilisateurs");
-        showPlaceholder("Module de gestion des utilisateurs en cours d'intégration.");
+        try {
+            Node utilisateurs = SceneNavigator.load(UTILISATEURS_VIEW);
+            if (rootContentStack != null) {
+                rootContentStack.getChildren().setAll(utilisateurs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder("Impossible de charger la gestion des utilisateurs : " + e.getMessage());
+        }
     }
 
     @FXML
