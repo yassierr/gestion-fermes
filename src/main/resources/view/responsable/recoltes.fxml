@@ -125,15 +125,6 @@
                 </columns>
             </TableView>
 
-            <HBox styleClass="table-footer" alignment="CENTER_LEFT">
-                <Label fx:id="lblPagination" text="Aucune pesée" styleClass="pagination-info"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <HBox spacing="6.0" alignment="CENTER_RIGHT">
-                    <Button fx:id="btnPrecedent" text="‹" styleClass="page-btn" onAction="#onPagePrecedente"/>
-                    <HBox fx:id="boxPages" spacing="6.0" alignment="CENTER"/>
-                    <Button fx:id="btnSuivant" text="›" styleClass="page-btn" onAction="#onPageSuivante"/>
-                </HBox>
-            </HBox>
         </VBox>
     </VBox>
 </ScrollPane>
