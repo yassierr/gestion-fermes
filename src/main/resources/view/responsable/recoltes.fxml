@@ -27,7 +27,7 @@
             fx:id="scrollPage" styleClass="page" fitToWidth="true" hbarPolicy="NEVER">
 
     <stylesheets>
-        <URL value="C:\Users\AD\Desktop\gestion-fermes\src\main\resources\css\recoltes.css"/>
+        <URL value="@../../css/recoltes.css"/>
     </stylesheets>
 
     <VBox spacing="24.0" styleClass="page-content">
