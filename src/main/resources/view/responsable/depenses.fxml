@@ -26,7 +26,7 @@
             styleClass="page" fitToWidth="true" hbarPolicy="NEVER">
 
     <stylesheets>
-        <URL value="C:\Users\AD\Desktop\gestion-fermes\src\main\resources\css\depenses.css"/>
+        <URL value="@../../css/depenses.css"/>
     </stylesheets>
 
     <VBox spacing="22.0" styleClass="page-content">
