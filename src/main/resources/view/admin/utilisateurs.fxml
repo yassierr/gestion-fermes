@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Écran « Gestion des Utilisateurs » (maquette admin, page Utilisateurs).
+  Contenu seul : la sidebar et la barre du haut sont dans admin-main.fxml.
+  Contrôleur : ma.ferme.controller.admin.UtilisateurController
+-->
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.ferme.controller.admin.UtilisateurController"
+            fitToWidth="true" hbarPolicy="NEVER" styleClass="usr-scroll">
+
+    <stylesheets>
+        <URL value="@../../css/utilisateurs.css"/>
+    </stylesheets>
+
+    <VBox styleClass="usr-page" spacing="24.0">
+        <padding>
+            <Insets top="28.0" right="32.0" bottom="28.0" left="32.0"/>
+        </padding>
+
+        <!-- En-tête -->
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Gestion des Utilisateurs" styleClass="usr-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnCreer" text="+ Créer un compte" styleClass="usr-btn-primary"
+                    onAction="#onCreerCompte"/>
+        </HBox>
+
+        <!-- Compteurs -->
+        <HBox spacing="20.0">
+            <VBox styleClass="usr-stat-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                <Label text="TOTAL DES COMPTES" styleClass="usr-stat-label"/>
+                <Label fx:id="lblTotal" text="—" styleClass="usr-stat-value"/>
+            </VBox>
+            <VBox styleClass="usr-stat-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                <Label text="RESPONSABLES DE FERME" styleClass="usr-stat-label"/>
+                <Label fx:id="lblResponsables" text="—" styleClass="usr-stat-value"/>
+            </VBox>
+            <VBox styleClass="usr-stat-card" spacing="8.0" HBox.hgrow="ALWAYS" prefWidth="100.0" maxWidth="Infinity">
+                <Label text="AGENTS RESSOURCES HUMAINES" styleClass="usr-stat-label"/>
+                <Label fx:id="lblAgents" text="—" styleClass="usr-stat-value"/>
+            </VBox>
+        </HBox>
+
+        <!-- Carte : filtres + tableau + pagination -->
+        <VBox styleClass="usr-card">
+            <HBox styleClass="usr-filter-bar" spacing="12.0" alignment="CENTER_LEFT">
+                <TextField fx:id="txtRecherche" styleClass="usr-search" HBox.hgrow="ALWAYS"
+                           promptText="Rechercher par nom ou login..."/>
+                <ComboBox fx:id="cbRole" styleClass="usr-combo" prefWidth="185.0"/>
+                <ComboBox fx:id="cbFerme" styleClass="usr-combo" prefWidth="220.0"/>
+                <Button fx:id="btnReinitialiser" text="Réinitialiser" styleClass="usr-btn-reset"
+                        onAction="#onReinitialiser"/>
+            </HBox>
+
+            <TableView fx:id="table" styleClass="usr-table" minHeight="160.0">
+                <columns>
+                    <TableColumn fx:id="colNom" text="UTILISATEUR" prefWidth="210.0" sortable="false"/>
+                    <TableColumn fx:id="colLogin" text="LOGIN" prefWidth="160.0" sortable="false"/>
+                    <TableColumn fx:id="colRole" text="RÔLE" prefWidth="140.0" sortable="false"/>
+                    <TableColumn fx:id="colFerme" text="FERME RATTACHÉE" prefWidth="200.0" sortable="false"/>
+                    <TableColumn fx:id="colStatut" text="STATUT" prefWidth="110.0" sortable="false"/>
+                    <TableColumn fx:id="colActions" text="ACTIONS" prefWidth="200.0" sortable="false"/>
+                </columns>
+            </TableView>
+
+            <HBox styleClass="usr-footer" alignment="CENTER_LEFT" spacing="8.0">
+                <Label fx:id="lblPagination" text="" styleClass="usr-pagination-info"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnPrecedent" text="‹ Précédent" styleClass="usr-page-btn"
+                        onAction="#onPagePrecedente"/>
+                <Label fx:id="lblPage" text="Page 1 / 1" styleClass="usr-page-label"/>
+                <Button fx:id="btnSuivant" text="Suivant ›" styleClass="usr-page-btn"
+                        onAction="#onPageSuivante"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

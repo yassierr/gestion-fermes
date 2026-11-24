@@ -1,0 +1,373 @@
+/* Styles de l'écran Récoltes (recoltes.fxml).
+   Couleurs et dimensions reprises de la maquette « Récoltes » : vert #2E6B34, survol #25582A,
+   fond de page #F8FAFC, bordures #F1F5F9 / #E2E8F0. */
+
+/* ---------- page ---------- */
+.page {
+    -fx-background-color: #F8FAFC;
+    -fx-background: #F8FAFC;
+    -fx-padding: 0;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13.5px;
+}
+
+.page > .viewport {
+    -fx-background-color: #F8FAFC;
+}
+
+.page-content {
+    -fx-background-color: #F8FAFC;
+}
+
+.page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #182334;
+}
+
+.page-subtitle {
+    -fx-font-size: 13.5px;
+    -fx-text-fill: #64748B;
+}
+
+/* ---------- cartes ---------- */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #F1F5F9;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 3, 0, 0, 1);
+}
+
+.stock-card {
+    -fx-padding: 24 28 24 28;
+}
+
+.stock-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+.stock-icon-box {
+    -fx-background-color: #D1FADF;
+    -fx-background-radius: 10;
+}
+
+.stock-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #182334;
+}
+
+.stock-unit {
+    -fx-font-size: 15px;
+    -fx-text-fill: #64748B;
+}
+
+/* ---------- icônes (trait seul) ---------- */
+.icone {
+    -fx-fill: transparent;
+    -fx-stroke: #2E6B34;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+.table-cell .icone,
+.action-btn .icone {
+    -fx-stroke: #64748B;
+    -fx-scale-x: 0.65;
+    -fx-scale-y: 0.65;
+}
+
+.action-btn:hover .icone {
+    -fx-stroke: #182334;
+}
+
+.icone-blanche {
+    -fx-fill: transparent;
+    -fx-stroke: white;
+    -fx-stroke-width: 2.5;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+
+/* ---------- formulaire ---------- */
+.form-card {
+    -fx-padding: 22 26 26 26;
+}
+
+.form-card-header {
+    -fx-padding: 0 0 18 0;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+
+.plus-box {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 8;
+}
+
+.form-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+.form-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+.field,
+.field-combo {
+    -fx-pref-height: 42;
+    -fx-min-height: 42;
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: #182334;
+    -fx-prompt-text-fill: #94A3B8;
+    -fx-padding: 0 38 0 14;
+}
+
+.field-combo {
+    -fx-padding: 0;
+}
+
+.field-combo > .text-field,
+.field-combo > .list-cell {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0 0 0 14;
+    -fx-font-size: 13.5px;
+}
+
+.field-combo > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 8;
+}
+
+.field-combo > .arrow-button > .arrow {
+    -fx-background-color: #64748B;
+}
+
+.field:focused,
+.field-combo:focused {
+    -fx-border-color: #2E6B34;
+    -fx-background-insets: 0;
+}
+
+.field-suffix {
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+.submit-btn {
+    -fx-pref-height: 42;
+    -fx-min-height: 42;
+    -fx-background-color: #2E6B34;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 8;
+}
+
+.submit-btn:hover {
+    -fx-background-color: #25582A;
+}
+
+.secondary-btn {
+    -fx-pref-height: 42;
+    -fx-min-height: 42;
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 8;
+    -fx-text-fill: #334155;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 18 0 18;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #E2E8F0;
+}
+
+/* ---------- tableau ---------- */
+.table-card {
+    -fx-padding: 0;
+}
+
+.data-table {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 14 14 0 0;
+    -fx-pref-height: 42;
+}
+
+.data-table .column-header,
+.data-table .filler {
+    -fx-background-color: #F8FAFC;
+    -fx-size: 42;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+
+.data-table .column-header .label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 0 0 0 12;
+}
+
+.data-table .column-header.col-droite .label {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-padding: 0 12 0 0;
+}
+
+.data-table .table-row-cell,
+.data-table .table-row-cell:filled:selected,
+.data-table .table-row-cell:odd {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-cell-size: 52;
+}
+
+.data-table .table-row-cell:filled:hover {
+    -fx-background-color: #FCFDFE;
+}
+
+.data-table .table-cell {
+    -fx-padding: 0 12 0 12;
+    -fx-alignment: CENTER-LEFT;
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.data-table .table-cell.col-droite {
+    -fx-alignment: CENTER-RIGHT;
+}
+
+/* le poids garde de l'air avant la colonne Variété (maquette : 36 px) */
+.data-table .column-header.col-poids .label {
+    -fx-padding: 0 36 0 0;
+}
+
+.data-table .table-cell.col-poids {
+    -fx-padding: 0 36 0 12;
+}
+
+.data-table .placeholder .label {
+    -fx-text-fill: #94A3B8;
+}
+
+.cellule-date {
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+.cellule-poids {
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+.cellule-unite {
+    -fx-text-fill: #64748B;
+}
+
+/* ---------- pastilles de variété ---------- */
+.pastille {
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 999;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.pastille-verte  { -fx-background-color: #DCFCE7; -fx-text-fill: #166534; }
+.pastille-jaune  { -fx-background-color: #FEF3C7; -fx-text-fill: #92400E; }
+.pastille-rouge  { -fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; }
+.pastille-grise  { -fx-background-color: #E2E8F0; -fx-text-fill: #334155; }
+
+.pastille-verte .pastille-point { -fx-fill: #22C55E; }
+.pastille-jaune .pastille-point { -fx-fill: #F59E0B; }
+.pastille-rouge .pastille-point { -fx-fill: #EF4444; }
+.pastille-grise .pastille-point { -fx-fill: #64748B; }
+
+/* ---------- boutons d'action des lignes ---------- */
+.action-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-padding: 4 6 4 6;
+    -fx-cursor: hand;
+}
+
+.action-btn:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+/* ---------- pied de tableau / pagination ---------- */
+.table-footer {
+    -fx-padding: 16 24 16 24;
+    -fx-background-color: white;
+    -fx-background-radius: 0 0 14 14;
+}
+
+.pagination-info {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: #64748B;
+}
+
+.page-btn {
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 8 0 8;
+    -fx-cursor: hand;
+}
+
+.page-btn:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.page-btn:disabled {
+    -fx-text-fill: #CBD5E1;
+    -fx-opacity: 1;
+}
+
+.page-btn-active,
+.page-btn-active:hover {
+    -fx-background-color: #2E6B34;
+    -fx-text-fill: white;
+}
+
+.page-points {
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+    -fx-padding: 0 4 0 4;
+}

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ma.ferme.controller.rh.DashboardRhController"
+            fitToWidth="true"
+            style="-fx-background-color: transparent; -fx-background: transparent;">
+
+    <VBox spacing="20">
+        <!-- Ligne de 4 cartes KPI -->
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <Label text="Effectif actif" style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblEffectifActif" text="0 ouvriers"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+            </VBox>
+
+            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <Label text="Présents aujourd'hui" style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblPresentsJour" text="0 / 0"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #16a34a;"/>
+            </VBox>
+
+            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <Label text="Salaires impayés en cours" style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblSoldeImpaye" text="0,00 MAD"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #d97706;"/>
+            </VBox>
+
+            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <Label text="Masse salariale versée" style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblMasseSalariale" text="0,00 MAD"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1b5e20;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Pointage du jour -->
+        <VBox spacing="12"
+              style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="lblDateJour" text="Pointage du jour"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Actualiser" onAction="#onActualiser"
+                        style="-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;"/>
+            </HBox>
+
+            <TableView fx:id="tablePointageJour" prefHeight="240">
+                <columns>
+                    <TableColumn fx:id="colMatricule" text="Matricule" prefWidth="130"/>
+                    <TableColumn fx:id="colNom" text="Ouvrier" prefWidth="240"/>
+                    <TableColumn fx:id="colStatutJour" text="Statut aujourd'hui" prefWidth="160"/>
+                    <TableColumn fx:id="colJoursImpayes" text="Jours non payés" prefWidth="150"/>
+                    <TableColumn fx:id="colSolde" text="Solde dû (MAD)" prefWidth="180"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- Derniers reçus de paie -->
+        <VBox spacing="12"
+              style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Derniers reçus de paie émis"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+
+            <TableView fx:id="tableDerniersRecus" prefHeight="210">
+                <columns>
+                    <TableColumn fx:id="colRecuNumero" text="N° Reçu" prefWidth="160"/>
+                    <TableColumn fx:id="colRecuDate" text="Date paiement" prefWidth="150"/>
+                    <TableColumn fx:id="colRecuPeriode" text="Période couverte" prefWidth="230"/>
+                    <TableColumn fx:id="colRecuNbOuvriers" text="Ouvriers payés" prefWidth="140"/>
+                    <TableColumn fx:id="colRecuTotal" text="Montant total (MAD)" prefWidth="180"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </VBox>
+</ScrollPane>

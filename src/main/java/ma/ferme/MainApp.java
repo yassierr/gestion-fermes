@@ -22,6 +22,10 @@ public class MainApp extends Application {
     public void start(Stage stage) {
         SceneNavigator.setStage(stage);
         SceneNavigator.goTo("/view/login.fxml", "Gestion des fermes - Connexion");
+       /*SceneNavigator.goTo(
+    "/view/admin/admin-main.fxml",
+    "Gestion des fermes - Administration"
+);*/
     }
 
     /**

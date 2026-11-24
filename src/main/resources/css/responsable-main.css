@@ -1,0 +1,131 @@
+/* Styles du cadre de l'espace Responsable (responsable-main.fxml) :
+   barre latérale, barre de date et zone centrale.
+   Couleurs de la maquette : vert #2E6B34, fond de page #F8FAFC, bordures #E2E8F0 / #F1F5F9. */
+.main-root {
+    -fx-background-color: #F8FAFC;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13.5px;
+}
+
+.zone-contenu {
+    -fx-background-color: #F8FAFC;
+}
+
+/* ---------- barre latérale ---------- */
+.sidebar {
+    -fx-background-color: white;
+    -fx-border-color: transparent #E2E8F0 transparent transparent;
+}
+
+.sidebar-top {
+    -fx-padding: 24 16 24 16;
+}
+
+.brand {
+    -fx-padding: 0 8 0 8;
+    -fx-spacing: 4;
+}
+
+.brand-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+}
+
+.brand-subtitle {
+    -fx-font-size: 9.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 11 16 11 16;
+    -fx-text-fill: #475569;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 500;
+    -fx-cursor: hand;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #182334;
+}
+
+.nav-btn.nav-active,
+.nav-btn.nav-active:hover {
+    -fx-background-color: #2E6B34;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.nav-list {
+    -fx-padding: 32 0 0 0;
+}
+
+.sidebar-bottom {
+    -fx-padding: 18 16 18 16;
+    -fx-border-color: #F1F5F9 transparent transparent transparent;
+}
+
+.user-name {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #182334;
+}
+
+.user-role {
+    -fx-font-size: 11.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E6B34;
+}
+
+.logout-btn {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 8;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-padding: 9 12 9 12;
+    -fx-graphic-text-gap: 8;
+    -fx-cursor: hand;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #E2E8F0;
+}
+
+.icone-logout {
+    -fx-fill: transparent;
+    -fx-stroke: #334155;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+    -fx-scale-x: 0.65;
+    -fx-scale-y: 0.65;
+}
+
+/* ---------- barre de date ---------- */
+.topbar {
+    -fx-background-color: white;
+    -fx-padding: 0 36 0 36;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+
+.topbar-date {
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #64748B;
+}
+
+.icone-topbar {
+    -fx-fill: transparent;
+    -fx-stroke: #64748B;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+    -fx-scale-x: 0.6;
+    -fx-scale-y: 0.6;
+}
